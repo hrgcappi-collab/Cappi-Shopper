@@ -1,0 +1,16 @@
+# Секрети — ніколи в репозиторій
+api.env
+*.env
+!api.env.example
+
+# Стан бота: ролі, перевірки, фото-ідентифікатори, хто стукав
+data/
+.selftest-home/
+доступ.json
+сесії.json
+перевірки.jsonl
+невідомі.jsonl
+
+__pycache__/
+*.pyc
+.DS_Store
