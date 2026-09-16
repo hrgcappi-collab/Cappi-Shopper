@@ -41,7 +41,7 @@ def конфіг():
     except FileNotFoundError:
         pass
     for k, v in os.environ.items():
-        if k in з_файлу or k.startswith(("TELEGRAM_", "SHOPPER_", "REPORT_", "OPENAI_")):
+        if k in з_файлу or k.startswith(("TELEGRAM_", "SHOPPER_", "REPORT_", "OPENAI_", "SYRVE_", "LOOPA_", "CAPPI_")):
             з_файлу[k] = v
     return з_файлу
 

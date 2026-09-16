@@ -36,7 +36,9 @@ def невідомі_функції():
         дерево = ast.parse(код)
         визначені = set(dir(__builtins__))
         for в in ast.walk(дерево):
-            if isinstance(в, (ast.FunctionDef, ast.ClassDef)):
+            if isinstance(в, ast.ClassDef):
+                визначені.add(в.name)
+            elif isinstance(в, ast.FunctionDef):
                 визначені.add(в.name)
                 for а in в.args.args + в.args.kwonlyargs:
                     визначені.add(а.arg)
