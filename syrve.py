@@ -176,10 +176,15 @@ def розібрати(o):
         "обіцяно_хв": round((до_строку - створено).total_seconds() / 60) if створено and до_строку else None,
         "сума": o.get("sum"),
         "тип": (o.get("orderType") or {}).get("name") if isinstance(o.get("orderType"), dict) else o.get("orderType"),
-        "джерело": o.get("sourceKey") or (o.get("marketingSource") or {}).get("name") if isinstance(o.get("marketingSource"), dict) else o.get("sourceKey"),
+        # Glovo в Cloud API ніяк не позначений у sourceKey/marketingSource (перевірено
+        # 16.09: там лише GetOrder або порожньо) — його видає сервісна позиція
+        # «Сервісний збір_Glovo» у складі замовлення.
+        "джерело": "glovo" if any("glovo" in str((i.get("product") or {}).get("name", "")).lower() for i in (o.get("items") or []) if isinstance(i, dict))
+                   else (o.get("sourceKey") or ((o.get("marketingSource") or {}).get("name") if isinstance(o.get("marketingSource"), dict) else None)),
         "позиції": [{"id": (i.get("product") or {}).get("id"), "назва": (i.get("product") or {}).get("name"),
                      "кількість": i.get("amount"), "сума": i.get("resultSum", i.get("price"))}
-                    for i in (o.get("items") or []) if isinstance(i, dict)],
+                    for i in (o.get("items") or []) if isinstance(i, dict)
+                    and "сервісний збір" not in str((i.get("product") or {}).get("name", "")).lower()],
         # Адреса — лише хешем: досить, щоб помітити повтор, і нічого не розкриває.
         "адреса_хеш": _хеш_адреси(o.get("deliveryPoint")),
         # Оператор і кур'єр — для внутрішньої прив'язки; у чати не йдуть.
