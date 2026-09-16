@@ -32,6 +32,7 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    # Docker тут rootless: ліміт процесора cgroup не віддає (cpu.max відсутній),
+    # тому лише пам'ять і кількість процесів.
     mem_limit: 256m
-    cpus: 0.5
     pids_limit: 64
