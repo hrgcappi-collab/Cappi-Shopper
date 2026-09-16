@@ -121,10 +121,59 @@ def відмітити_повтор(т, перевірка_id):
     сховище.json_писати(ФАЙЛ_ТІКЕТІВ, всі)
 
 
+def _пише():
+    """Запис вмикається змінною LOOPA_WRITE=1 після того, як Loopa підняла
+    endpoint-и з docs/Запити-до-джерел.md."""
+    return налаштовано() and str(сховище.конфіг().get("LOOPA_WRITE", "")).strip() in ("1", "true", "так")
+
+
+def _post(шлях, тіло):
+    к = _конф()
+    req = urllib.request.Request(f"{к['url']}{шлях}", data=json.dumps(тіло, ensure_ascii=False).encode(),
+                                 headers={"Authorization": f"Bearer {к['токен']}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=40) as r:
+        return json.loads(r.read() or b"{}")
+
+
 def надіслати_тікет(т):
-    """Єдина точка підключення запису в Loopa. Поки endpoint не узгоджено —
-    нічого не шле, повертає (False, None)."""
-    return False, None
+    """Запис тікета — за контрактом із запиту до Loopa:
+    POST /api/v1/mystery/tickets → {"id": …}. Поки LOOPA_WRITE не
+    увімкнено або Loopa відмовила — (False, None), тікет лишається локально."""
+    if not _пише():
+        return False, None
+    try:
+        в = _post("/api/v1/mystery/tickets", {
+            "check_id": т["перевірка"], "branch": т["філія"], "channel": т["канал"], "title": т["чому"][:120],
+            "description": т["чому"], "due": т["строк"], "test": т["тестове"], "source": "mystery-shopper-bot"})
+        return True, в.get("id")
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
+        print(f"Loopa тікет не записано: {str(e)[:100]}")
+        return False, None
+
+
+def надіслати_перевірку(п):
+    """Прийнята анкета — у Loopa (розділ «Тайники»): оцінки по групах,
+    критичні, тайминг, без персоналій тайника. POST /api/v1/mystery/checks."""
+    if not _пише():
+        return False
+    о = п.get("оцінка") or {}
+    тіло = {"id": п["id"], "date": п["вікно"]["дата"], "branch": п["філія"], "channel": п["канал"],
+            "shopper": None, "score": о.get("загальна"), "zone": о.get("зона"),
+            "groups": {г: гр.get("відсоток") for г, гр in (о.get("групи") or {}).items()},
+            "critical": [к["що"] for к in о.get("критичні", [])],
+            "delivery_minutes": о.get("час_доставки_хв"), "delay_minutes": о.get("запізнення_хв"),
+            "promised_minutes": ((п.get("syrve") or {}).get("замовлення") or {}).get("обіцяно_хв") or п["анкета"]["відповіді"].get("обіцяний_час"),
+            "syrve_order": ((п.get("syrve") or {}).get("замовлення") or {}).get("номер"),
+            "provocation": ((п.get("завдання") or {}).get("провокація") or {}).get("код"),
+            "impression": п["анкета"]["відповіді"].get("заг_враження"), "fix_first": п["анкета"]["відповіді"].get("заг_виправити"),
+            "questionnaire_version": п["анкета"].get("версія"), "task_version": (п.get("завдання") or {}).get("версія")}
+    try:
+        _post("/api/v1/mystery/checks", тіло)
+        журнал.запис("агент", "loopa:перевірка записана", п["id"])
+        return True
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
+        print(f"Loopa перевірка не записана: {str(e)[:100]}")
+        return False
 
 
 def текст_тікета(т):
