@@ -27,6 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
 import access
+import api
 import анкета
 import виплати
 import завдання
@@ -139,11 +140,15 @@ def тихо(chat, text, inline=None, keys=True):
         print(f"не доставлено {chat}: {str(e)[:80]}")
 
 
-def завантажити(file_id):
-    """Файл із Telegram — текстом. getFile → шлях → скачати."""
+def завантажити_байти(file_id):
+    """Файл із Telegram: getFile → шлях → скачати."""
     шлях = tg("getFile", file_id=file_id)["result"]["file_path"]
     with urllib.request.urlopen(f"https://api.telegram.org/file/bot{TOKEN}/{шлях}", timeout=70) as r:
-        return r.read().decode("utf-8", "replace")
+        return r.read()
+
+
+def завантажити(file_id):
+    return завантажити_байти(file_id).decode("utf-8", "replace")
 
 
 def файл(chat, імя, байти, підпис=None):
@@ -1403,6 +1408,18 @@ def тижневі_звіти():
 )
 
 
+api.підключити(
+    прийняти=прийняти, на_доробку=на_доробку, відхилити=відхилити, спитати_отримання=спитати_отримання,
+    повідомити_тайника=lambda uid, текст: тихо(uid, е(текст)),
+    активувати=lambda uid, хто: (тайники.активувати(uid, хто),
+                                 тихо(uid, "Тебе прийнято в програму! Лишилось підтвердити правила і пройти короткий тест.",
+                                      inline=[[{"text": "▶️ Пройти", "callback_data": "т:тест"}]])),
+    нова_хвиля=lambda хто, відкрити: нова_хвиля(хто, відкрити=відкрити),
+    відкрити_хвилю=відкрити_хвилю,
+    файл_telegram=завантажити_байти,
+)
+
+
 # ================================================================ цикл
 _ПУЛ = ThreadPoolExecutor(max_workers=8, thread_name_prefix="чат")
 _ЗАМКИ = {}
@@ -1442,6 +1459,7 @@ def main():
     print(f"тайний гість запущений: анкета v{анкета.версія()}, активних тайників {len(тайники.активні())}, "
           f"мозок {'є' if мозок.увімкнено() else 'вимкнено'}")
     планувальник.запустити()
+    api.запустити()
     offset = None
     while True:
         try:

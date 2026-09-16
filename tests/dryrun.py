@@ -373,5 +373,75 @@ def прогнати(тихо=False):
         print("\nпрогін пройдено")
 
 
+
+
+def api_прогін():
+    """HTTP API на живому сервері у потоці — читання і рішення."""
+    import os, sys, json, urllib.request, urllib.parse, urllib.error, shutil, tempfile
+    дім = tempfile.mkdtemp(prefix="shopper-api-")
+    os.environ["SHOPPER_HOME"] = дім
+    os.environ["SHOPPER_API_TOKEN"] = "test-token"
+    os.environ["TELEGRAM_ALLOWED_IDS"] = str(ВЛАСНИК)
+    for м, мод in list(sys.modules.items()):
+        if getattr(мод, "__file__", None) and os.path.dirname(os.path.abspath(мод.__file__)) == ТУТ:
+            sys.modules.pop(м)
+    import bot, api, перевірки, тайники, форма
+    bot.tg = lambda method, **p: {"ok": True, "result": {}}
+    сервер = api.запустити(порт=18788)
+    assert сервер
+    # трохи даних: тайник + перевірка на ревю
+    т = тайники.зареєструвати(Т1, {"імя": "Тест", "телефон": "+380671234567", "район": "Центр"})
+    тайники.активувати(Т1, ВЛАСНИК)
+    п = {"id": "П-0001", "статус": "на ревю", "тайник": Т1, "філія": "Лазарєва", "канал": "Сайт", "хвиля": None, "слот": None,
+         "вікно": {"дата": "2026-09-24", "від": "18:00", "до": "21:00"}, "історія": [],
+         "завдання": {"версія": "1.0", "згенеровано": форма.зараз(), "позиції": [], "на_вибір": [], "бюджет": 700, "провокація": None},
+         "анкета": {"версія": "1.1", "відповіді": {"заг_оцінка": 4, "заг_враження": "Все добре, дуже смачно, кур'єр ввічливий і швидкий", "сума_замовлення": 500,
+                                                  "фото_чек": "AgAC-1"}, "здано": форма.зараз()},
+         "оцінка": None, "приймання": {"рекомендація": "прийняти", "чому": "усе гаразд", "перевірки": [], "бракує": []}, "виплата": None, "створено": форма.зараз()}
+    перевірки.зберегти(п)
+
+    def get(шлях, роль="marketer"):
+        шлях = urllib.parse.quote(шлях, safe="/?=&")
+        r = urllib.request.Request(f"http://127.0.0.1:18788{шлях}", headers={"Authorization": "Bearer test-token", "X-Role": роль})
+        with urllib.request.urlopen(r, timeout=10) as в:
+            return в.status, json.loads(в.read())
+
+    def post(шлях, тіло):
+        шлях = urllib.parse.quote(шлях, safe="/?=&")
+        r = urllib.request.Request(f"http://127.0.0.1:18788{шлях}", data=json.dumps(тіло).encode(),
+                                   headers={"Authorization": "Bearer test-token", "X-Role": "marketer", "X-User": "zhenya", "Content-Type": "application/json"})
+        with urllib.request.urlopen(r, timeout=10) as в:
+            return в.status, json.loads(в.read())
+
+    try:
+        urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:18788/api/queue"), timeout=5)
+        assert False, "без токена мало бути 401"
+    except urllib.error.HTTPError as e:
+        assert e.code == 401
+    s, q = get("/api/queue")
+    assert s == 200 and q["kpi"]["на_ревю"] == 1 and any(x["тип"] == "ревю" for x in q["черга"])
+    s, к = get("/api/checks/П-0001")
+    assert к["тайник"] == "Т-001" and к["тайник_картка"]["телефон"] == "+380671234567" and к["медіа"][0]["url"].startswith("/api/media/")
+    s, к_без = get("/api/checks/П-0001", роль="viewer")
+    assert "телефон" not in к_без["тайник_картка"], "без ролі персоналій бути не повинно"
+    for шлях in ("/api/waves", "/api/checks?month=2026-09", "/api/shoppers", "/api/payouts", "/api/etalons", "/api/analytics", "/api/rules", "/api/tickets", "/api/journal", "/api/monthly"):
+        s, _ = get(шлях)
+        assert s == 200, шлях
+    s, р = post("/api/checks/П-0001/decision", {"action": "accept"})
+    assert р["статус"] == "прийнята" and р["виплата"]["статус"] == "у черзі на виплату"
+    s, в = post(f"/api/payouts/{р['виплата']['номер']}/paid", {})
+    assert в["статус"] == "виплачена"
+    s, пр = post("/api/rules", {"ставка_за_анкету": 80})
+    assert пр["налаштування"]["ставка_за_анкету"] == 80
+    s, х = post("/api/waves", {"action": "create"})
+    assert х["статус"] == "чернетка"
+    s, х = post(f"/api/waves/{х['id']}/open", {})
+    assert х["статус"] == "відкрито набір"
+    сервер.shutdown()
+    shutil.rmtree(дім, ignore_errors=True)
+
+
 if __name__ == "__main__":
     прогнати()
+    api_прогін()
+    print("api пройдено")

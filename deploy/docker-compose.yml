@@ -21,6 +21,11 @@ services:
         max-file: "5"
     environment:
       TZ: Europe/Kyiv
+    ports:
+      # HTTP API для розділу «Тайники» в Loopa. Лише localhost: назовні —
+      # через nginx з TLS, коли Loopa підключиться. Без SHOPPER_API_TOKEN
+      # в api.env сервер не стартує.
+      - "127.0.0.1:8788:8788"
     volumes:
       # Стан на хості: api.env, ролі, незавершені й завершені перевірки.
       # Шлях від папки з цим файлом: ./data означало б deploy/data.

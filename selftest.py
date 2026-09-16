@@ -105,6 +105,7 @@ def прогін():
     import tests.dryrun as d
     try:
         d.прогнати(тихо=True)
+        d.api_прогін()
     except Exception as e:
         import traceback
         помилки.append(f"прогін: {type(e).__name__}: {e}\n" + traceback.format_exc()[-1500:])
