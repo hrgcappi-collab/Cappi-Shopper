@@ -1,4 +1,11 @@
 # Запуск:  docker compose -f deploy/docker-compose.yml up -d --build
+#
+# Контейнер ізольований від сусідів: своя мережа (cappi-shopper_default —
+# не deploy_default, де живе Core), жодних спільних томів, жодних портів
+# назовні (Telegram опитується довгим полінгом), файлова система лише для
+# читання, окрім стану в ~/.shopper. Усе, що знає про Core, — нічого.
+name: cappi-shopper
+
 services:
   cappi-shopper:
     build:
@@ -18,3 +25,13 @@ services:
       # Стан на хості: api.env, ролі, незавершені й завершені перевірки.
       # Шлях від папки з цим файлом: ./data означало б deploy/data.
       - ../data:/root/.shopper
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
