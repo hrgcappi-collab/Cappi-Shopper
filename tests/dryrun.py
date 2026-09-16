@@ -466,11 +466,11 @@ def api_прогін():
     нова = json.loads(json.dumps(q["анкета"]))
     нова["блоки"][0]["кроки"][1]["питання"] = "Скріншот екрана підтвердження (змінено з Loopa)"
     s, r = post("/api/questionnaire", нова)
-    assert r["версія"] == "1.2" and "змінено з Loopa" in json.dumps(r["анкета"], ensure_ascii=False)
-    s, стара = get("/api/questionnaire/1.1")
+    assert r["версія"] == "1.3" and "змінено з Loopa" in json.dumps(r["анкета"], ensure_ascii=False)
+    s, стара = get("/api/questionnaire/1.2")
     assert "змінено з Loopa" not in json.dumps(стара, ensure_ascii=False)
     s, к = get("/api/checks/П-0001")
-    assert к["анкета"]["версія"] == "1.1"
+    assert к["анкета"]["версія"] == "1.1"     # стара перевірка лишилась на своїй версії
     зламана = json.loads(json.dumps(нова)); зламана["блоки"][0]["кроки"][0]["тип"] = "невідомий"
     try:
         post("/api/questionnaire", зламана); assert False
