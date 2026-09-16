@@ -62,6 +62,9 @@ def прогнати(тихо=False):
     надіслано = []
 
     def fake_tg(method, **p):
+        if method == "editMessageText":
+            надіслано.append((p["chat_id"], "[редаговано] " + p.get("text", ""), p.get("reply_markup")))
+            return {"ok": True, "result": {}}
         if method in ("sendMessage", "sendPhoto"):
             надіслано.append((p["chat_id"], p.get("text") or f"[фото {p.get('photo')}]", p.get("reply_markup")))
             if not тихо:
@@ -89,7 +92,7 @@ def прогнати(тихо=False):
     def кнопка(chat, дані, хто=None):
         if not тихо:
             print(f"{chat} ← ({дані})")
-        bot.кнопка({"message": {"chat": {"id": chat}}, "data": дані, "from": {"id": хто or chat, "first_name": "К"}})
+        bot.кнопка({"message": {"chat": {"id": chat}, "message_id": 1}, "data": дані, "from": {"id": хто or chat, "first_name": "К"}})
 
     def заповнити(chat, підправити=None):
         """Проходить поточну форму, відповідаючи правдоподібно."""
@@ -117,6 +120,7 @@ def прогнати(тихо=False):
                 кнопка(chat, "в:так")
             elif т == "вибір" and к.get("кілька"):
                 кнопка(chat, f"м:{к['варіанти'][0]}")
+                assert останнє(chat).startswith("[редаговано]"), "галочка мала редагувати повідомлення"
                 кнопка(chat, "м:готово")
             elif т == "вибір":
                 кнопка(chat, f"в:{к.get('правильно') or к['варіанти'][0]}")
