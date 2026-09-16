@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="62%">
+      <stop offset="0" stop-color="#5a25a6"/>
+      <stop offset="1" stop-color="#3a1272"/>
+    </radialGradient>
+    <linearGradient id="ic" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9a8f5"/>
+      <stop offset="1" stop-color="#9a6be0"/>
+    </linearGradient>
+    <radialGradient id="roll" cx="40%" cy="35%" r="65%">
+      <stop offset="0" stop-color="#ffb04a"/>
+      <stop offset="1" stop-color="#f26a12"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="640" fill="#0f0a1c"/>
+  <circle cx="320" cy="320" r="318" fill="url(#bg)"/>
+
+  <!-- логотип: каппі + рол над «і» -->
+  <text x="312" y="262" text-anchor="middle" font-family="Arial Rounded MT Bold, Avenir Next, Helvetica Neue, Arial, sans-serif" font-weight="700" font-size="150" fill="#ffffff" letter-spacing="-2">каппı</text>
+  <circle cx="474" cy="150" r="22" fill="url(#roll)"/>
+  <path d="M460 141 q14 6 28 0 M458 152 q16 8 32 0 M461 163 q13 6 26 0" fill="none" stroke="#c94d0b" stroke-width="3" opacity=".7"/>
+  <rect x="120" y="288" width="400" height="3" rx="1.5" fill="#ffffff" opacity=".45"/>
+
+  <!-- підпис -->
+  <text x="320" y="345" text-anchor="middle" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-weight="700" font-size="42" fill="#ffffff" letter-spacing="2">ТАЄМНИЙ ГІСТЬ</text>
+
+  <!-- іконки: лупа · інкогніто · зірка оцінки -->
+  <g fill="url(#ic)">
+    <!-- лупа -->
+    <circle cx="158" cy="440" r="38" fill="none" stroke="url(#ic)" stroke-width="15"/>
+    <line x1="186" y1="468" x2="216" y2="498" stroke="url(#ic)" stroke-width="19" stroke-linecap="round"/>
+    <!-- інкогніто: капелюх, окуляри, плечі -->
+    <path d="M276 410 L278 386 C280 366 298 356 320 356 C342 356 360 366 362 386 L364 410 C384 412 396 418 396 424 C396 432 360 438 320 438 C280 438 244 432 244 424 C244 418 256 412 276 410 Z"/>
+    <circle cx="300" cy="462" r="13" fill="none" stroke="url(#ic)" stroke-width="8"/>
+    <circle cx="340" cy="462" r="13" fill="none" stroke="url(#ic)" stroke-width="8"/>
+    <path d="M313 460 L327 460" stroke="url(#ic)" stroke-width="6"/>
+    <path d="M244 560 C244 516 278 492 320 492 C362 492 396 516 396 560 Z"/>
+    <!-- зірка -->
+    <path d="M484 398 L500 436 L540 440 L510 466 L520 506 L484 484 L448 506 L458 466 L428 440 L468 436 Z"/>
+  </g>
+</svg>
