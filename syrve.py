@@ -143,6 +143,22 @@ def стоплист():
     return out
 
 
+def клієнт(телефон):
+    """Картка клієнта в Syrve за телефоном: чи є, скільки замовлень.
+    Для верифікації кандидата (ТЗ 5) — контекст, не вирок."""
+    к = _конф()
+    try:
+        r = _post("customer/info", {"organizationId": к["орг"], "type": "phone", "phone": телефон}, токен(), timeout=30)
+    except Недоступний as e:
+        if "400" in str(e) or "404" in str(e):
+            return {"є": False}
+        raise
+    if not isinstance(r, dict) or not r.get("id"):
+        return {"є": False}
+    return {"є": True, "з": (r.get("whenRegistered") or "")[:10], "замовлень": len(r.get("orders") or []) or None,
+            "категорії": [c.get("name") for c in (r.get("categories") or []) if isinstance(c, dict)]}
+
+
 # ---------------------------------------------------------------- звірка
 def розібрати(o):
     """Замовлення Syrve → плоский словник для перевірки і звіту."""
