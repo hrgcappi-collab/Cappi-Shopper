@@ -6,7 +6,7 @@
 # Чому по кроках, а не одним ssh: у сесії Claude в auto-режимі об'єднана
 # команда «rsync + docker» блокується фільтром, окремі — ні. І селфтест
 # на сервері ДО рестарту: зламаний бот не має доїхати до людей.
-set -e
+set -e -o pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRV="cappi-bot"
 APP="~/app/cappi-shopper"
