@@ -455,6 +455,21 @@ def api_прогін():
     assert р["статус"] == "прийнята" and р["виплата"]["статус"] == "у черзі на виплату"
     s, в = post(f"/api/payouts/{р['виплата']['номер']}/paid", {})
     assert в["статус"] == "виплачена"
+    # анкета з Loopa: нова редакція → нова версія, стара перевірка читається за своєю
+    s, q = get("/api/questionnaire")
+    нова = json.loads(json.dumps(q["анкета"]))
+    нова["блоки"][0]["кроки"][1]["питання"] = "Скріншот екрана підтвердження (змінено з Loopa)"
+    s, r = post("/api/questionnaire", нова)
+    assert r["версія"] == "1.2" and "змінено з Loopa" in json.dumps(r["анкета"], ensure_ascii=False)
+    s, стара = get("/api/questionnaire/1.1")
+    assert "змінено з Loopa" not in json.dumps(стара, ensure_ascii=False)
+    s, к = get("/api/checks/П-0001")
+    assert к["анкета"]["версія"] == "1.1"
+    зламана = json.loads(json.dumps(нова)); зламана["блоки"][0]["кроки"][0]["тип"] = "невідомий"
+    try:
+        post("/api/questionnaire", зламана); assert False
+    except urllib.error.HTTPError as e:
+        assert e.code == 400
     s, пр = post("/api/rules", {"ставка_за_анкету": 80})
     assert пр["налаштування"]["ставка_за_анкету"] == 80
     s, х = post("/api/waves", {"action": "create"})

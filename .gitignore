@@ -17,6 +17,8 @@ data/
 мітки.json
 налаштування.json
 еталони.json
+анкета_версії.json
+провокації.json
 
 __pycache__/
 *.pyc
