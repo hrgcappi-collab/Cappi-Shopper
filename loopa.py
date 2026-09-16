@@ -71,6 +71,55 @@ def негатив(днів=30):
     return {"групи": групи, "філії": філії, "всього": int(за_кат.get("total") or 0), "днів": днів}
 
 
+# ---------------------------------------------------------------- меню і промт від Loopa
+def _get(шлях, timeout=40):
+    к = _конф()
+    req = urllib.request.Request(f"{к['url']}{шлях}", headers={"Authorization": f"Bearer {к['токен']}"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read())
+
+
+def _кеш(імя, годин, завантажити):
+    """Відповідь Loopa у файлі на N годин: генератор кличе це часто, а
+    Loopa синхронізує сайт раз на годину — частіше питати нема сенсу."""
+    к = сховище.json_читати(імя, {})
+    if к.get("оновлено") and datetime.fromisoformat(к["оновлено"]) > datetime.now() - timedelta(hours=годин):
+        return к.get("дані")
+    try:
+        дані = завантажити()
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
+        print(f"Loopa {імя}: {str(e)[:100]}")
+        return к.get("дані")            # старе краще, ніж нічого
+    сховище.json_писати(імя, {"оновлено": datetime.now().isoformat(timespec="seconds"), "дані": дані})
+    return дані
+
+
+def новинки_акції(днів=30):
+    """Новинки й акції з сайту cappi.ua через Loopa → у форматі новинки.json:
+    [{назва, syrve_id, тип, від, до}]. Порожньо, якщо Loopa не налаштована."""
+    if not налаштовано():
+        return []
+    д = _кеш("loopa_меню.json", 1, lambda: _get(f"/api/v1/mystery/menu?days={днів}")) or {}
+    res = []
+    for н in д.get("новинки") or []:
+        res.append({"назва": н.get("назва"), "syrve_id": н.get("syrve_id"), "тип": "новинка", "від": (н.get("від") or "")[:10] or None, "до": None,
+                    "категорія": н.get("категорія"), "ціна": н.get("ціна"), "джерело": "loopa"})
+    for а in д.get("акції") or []:
+        res.append({"назва": а.get("назва"), "syrve_id": а.get("syrve_id"), "тип": "акція", "від": None, "до": None,
+                    "категорія": а.get("категорія"), "ціна": а.get("ціна"), "стара_ціна": а.get("стара_ціна"), "джерело": "loopa"})
+    return [r for r in res if r["назва"]]
+
+
+def промт():
+    """Тижневий промт від Loopa (ТЗ-розробки §5): звернення за тиждень →
+    зрізи, відхилення, позиції під підозрою, що перевірити. Текст
+    править маркетолог; бот бере його перед генерацією ТЗ."""
+    if not налаштовано():
+        return None
+    д = _кеш("loopa_промт.json", 6, lambda: _get("/api/v1/mystery/prompt"))
+    return д if д and д.get("текст") else None
+
+
 # ---------------------------------------------------------------- тікети
 ФАЙЛ_ТІКЕТІВ = "тікети.json"
 
