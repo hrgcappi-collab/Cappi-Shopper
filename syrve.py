@@ -16,6 +16,7 @@
 Пошук замовлення тайника — за телефоном і датою:
 `deliveries/by_delivery_date_and_phone`.
 """
+import hashlib
 import json
 import re
 import time
@@ -163,10 +164,34 @@ def розібрати(o):
         "позиції": [{"id": (i.get("product") or {}).get("id"), "назва": (i.get("product") or {}).get("name"),
                      "кількість": i.get("amount"), "сума": i.get("resultSum", i.get("price"))}
                     for i in (o.get("items") or []) if isinstance(i, dict)],
+        # Адреса — лише хешем: досить, щоб помітити повтор, і нічого не розкриває.
+        "адреса_хеш": _хеш_адреси(o.get("deliveryPoint")),
         # Оператор і кур'єр — для внутрішньої прив'язки; у чати не йдуть.
         "оператор": (o.get("operator") or {}).get("name") if isinstance(o.get("operator"), dict) else None,
         "курєр": ((o.get("courierInfo") or {}).get("courier") or {}).get("name") if isinstance(o.get("courierInfo"), dict) else None,
     }
+
+
+def _хеш_адреси(точка):
+    if not isinstance(точка, dict):
+        return None
+    а = точка.get("address") or {}
+    ключ = " ".join(str(а.get(k) or "").lower().strip() for k in ("street", "house", "flat")) if isinstance(а, dict) else str(а)
+    ключ = re.sub(r"\s+", " ", ключ).strip()
+    return hashlib.sha256(ключ.encode()).hexdigest()[:16] if ключ else None
+
+
+def адреса_повторюється(п, з, днів=90):
+    """Та сама адреса доставки в іншій перевірці за період — кухня її впізнає."""
+    import перевірки
+    if not з.get("адреса_хеш"):
+        return False
+    від = (datetime.now() - timedelta(days=днів)).date().isoformat()
+    for інша in перевірки.усі():
+        зз = (інша.get("syrve") or {}).get("замовлення") or {}
+        if інша["id"] != п["id"] and інша["вікно"]["дата"] >= від and зз.get("адреса_хеш") == з["адреса_хеш"]:
+            return True
+    return False
 
 
 def знайти(п, телефон):
@@ -217,6 +242,8 @@ def звірити(п, телефон):
     if з["факт_хв"] is not None and оф and отр:
         свій = (datetime.fromisoformat(отр) - datetime.fromisoformat(оф)).total_seconds() / 60
         збіги["час вручення збігається (±15 хв)"] = abs(свій - з["факт_хв"]) <= 15
+    import налаштування
+    збіги["адреса не повторюється за квартал"] = not адреса_повторюється(п, з, налаштування.дай("адреса_повтор_днів"))
     return {"коли": datetime.now().isoformat(timespec="seconds"), "знайдено": True, "замовлення": з,
             "відсутні_позиції": відсутні, "збіги": збіги}
 

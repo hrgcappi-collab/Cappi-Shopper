@@ -54,7 +54,7 @@ def _скільки_разів(код, днів=90):
     from datetime import datetime, timedelta
     від = (datetime.now() - timedelta(days=днів)).isoformat()
     return sum(1 for п in перевірки.усі()
-               if (п.get("завдання") or {}).get("провокація", {}).get("код") == код and п["завдання"]["згенеровано"] >= від)
+               if ((п.get("завдання") or {}).get("провокація") or {}).get("код") == код and п["завдання"]["згенеровано"] >= від)
 
 
 def обрати(канал):
