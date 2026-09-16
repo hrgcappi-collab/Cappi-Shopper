@@ -1,0 +1,580 @@
+<title>ТЗ Тайники Каппі</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F6F7F4; --surface:#FFFFFF; --surface2:#EDEFEA; --surface3:#E2E5DE;
+  --border:#E2E5DE; --border-strong:#CFD4CA;
+  --text:#0B0F14; --text2:#2E3640; --muted:#5B6472; --muted2:#636B79;
+  --accent:#0B0F14; --accent2:#5B6472; --accent-light:#EDEFEA; --accent-bg:#EDEFEA; --accent-fg:#0B0F14;
+  --signal:#D6FF4F; --signal-deep:#B9E22F; --signal-ink:#0B0F14;
+  --data-1:#1E5AB8; --data-2:#0E9384; --data-3:#B54708;
+  --grad:#0B0F14; --ring:0 0 0 3px rgba(11,15,20,.18);
+  --green:#0F7A50; --green-bg:#E6F5EE; --green-fg:#157A55;
+  --red:#C0343D; --red-bg:#FCEBEC; --red-fg:#C24853;
+  --orange:#9A5B12; --orange-bg:#FBEFDE; --orange-fg:#A5641F;
+  --yellow:#A9830A; --yellow-bg:#FBF2D6; --yellow-fg:#8A6A08;
+  --blue:#2F6FD6; --blue-bg:#E7F0FC; --blue-fg:#245BB3;
+  --sidebar-bg:#FFFFFF; --sidebar-text:#5B6472;
+  --radius-sm:6px; --radius:10px; --radius-md:16px; --radius-lg:22px; --radius-full:999px;
+  --shadow-xs:0 1px 2px rgba(11,15,20,.04);
+  --shadow:0 1px 3px rgba(11,15,20,.06), 0 1px 2px rgba(11,15,20,.04);
+  --shadow-md:0 4px 10px rgba(11,15,20,.07), 0 1px 3px rgba(11,15,20,.05);
+  --shadow-lg:0 12px 28px rgba(11,15,20,.10), 0 2px 6px rgba(11,15,20,.05);
+  --ease:cubic-bezier(.32,.72,.35,1); --dur:.16s;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--text); font-family:Inter,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased}
+.sg{font-family:"Space Grotesk",Inter,sans-serif}
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:none; box-shadow:var(--ring); border-radius:var(--radius-sm)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+.shell{display:grid; grid-template-columns:248px 1fr; min-height:100%}
+
+/* ─ sidebar ─ */
+.sidebar{background:var(--sidebar-bg); border-right:1px solid var(--border); padding-block:0 8px; position:sticky; top:0; align-self:start; max-height:100vh; overflow-y:auto}
+.sidebar-logo{padding:20px 18px 16px; border-bottom:1px solid var(--border); margin-bottom:6px}
+.sidebar-logo .brand{font-size:21px; font-weight:800; letter-spacing:-.5px; font-family:"Space Grotesk",Inter,sans-serif}
+.sidebar-logo .sub{font-size:11px; color:var(--muted); letter-spacing:.3px; margin-top:3px}
+.sidebar-section{padding:15px 18px 6px; font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted2)}
+.nav-item{display:flex; align-items:center; gap:12px; padding:10px 12px; margin:2px 10px; border-radius:var(--radius); color:var(--sidebar-text); font-size:13.5px; font-weight:500; cursor:pointer; text-decoration:none; position:relative; background:transparent; border:0; transition:background var(--dur) var(--ease), color var(--dur), transform var(--dur) var(--ease)}
+.nav-item:hover{background:var(--surface2); color:var(--text); transform:translateX(3px)}
+.nav-item.active{background:linear-gradient(90deg,var(--accent-bg),color-mix(in srgb,var(--accent-bg) 35%,transparent)); color:var(--accent-fg); font-weight:600; box-shadow:var(--shadow-xs)}
+.nav-item.active::before{content:""; position:absolute; left:-10px; top:50%; transform:translateY(-50%); width:3px; height:22px; border-radius:0 4px 4px 0; background:var(--accent)}
+.nav-item .icon{width:20px; height:20px; flex:none; color:var(--muted2); display:flex; align-items:center; justify-content:center}
+.nav-item.active .icon{color:var(--accent)}
+.nav-item .icon svg{width:19px; height:19px; display:block}
+.nav-item .label{flex:1}
+.nav-count{font-size:11px; font-weight:700; color:var(--muted); background:var(--surface2); padding:1px 7px; border-radius:9px; min-width:20px; text-align:center}
+.nav-item.active .nav-count{background:color-mix(in srgb,var(--accent) 14%,transparent); color:var(--accent)}
+
+/* ─ topbar ─ */
+.main{min-width:0; display:flex; flex-direction:column}
+.topbar{background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; min-height:76px; display:flex; align-items:center; gap:16px; position:sticky; top:env(safe-area-inset-top,0px); z-index:50; flex-wrap:wrap}
+.topbar-title{font-family:"Space Grotesk",Inter,sans-serif; font-size:20px; font-weight:800; letter-spacing:-.4px; line-height:1.1; margin:0}
+.topbar-sub{font-size:12.5px; color:var(--muted); margin-top:3px}
+.topbar-search{flex:1; max-width:340px; margin:0 auto; display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 14px}
+.topbar-search input{flex:1; border:0; background:transparent; outline:none; color:var(--text); font-size:13px; font-family:inherit}
+.topbar-right{display:flex; align-items:center; gap:10px; flex-shrink:0}
+.top-avatar{width:38px; height:38px; border-radius:50%; background:var(--grad); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700}
+.update-pill{font-size:12px; color:var(--muted); background:var(--surface2); padding:4px 10px; border-radius:20px}
+
+/* ─ controls ─ */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:9px 18px; border-radius:var(--radius); font-size:13px; font-weight:600; letter-spacing:.1px; cursor:pointer; border:1px solid transparent; font-family:inherit; background:var(--surface); color:var(--text2); transition:background var(--dur) var(--ease), border-color var(--dur), transform var(--dur), box-shadow var(--dur)}
+.btn-primary{background:var(--signal); color:var(--signal-ink); box-shadow:var(--shadow-xs); font-weight:700}
+.btn-primary:hover{background:var(--signal-deep); transform:translateY(-1px); box-shadow:var(--shadow)}
+.btn-ghost{background:var(--surface); border:1px solid var(--border-strong); color:var(--text2)}
+.btn-ghost:hover{border-color:var(--accent2); color:var(--text)}
+.btn-sm{padding:6px 12px; font-size:12.5px}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap}
+.dr-trigger{display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border:1px solid var(--border-strong); border-radius:var(--radius); background:var(--surface); color:var(--text2); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer}
+.dr-trigger:hover{border-color:var(--accent2); color:var(--accent-fg)}
+.dr-trigger.set{background:var(--accent-bg); color:var(--accent-fg); border-color:transparent}
+.dr-trigger .chev{font-size:10px; color:var(--muted2)}
+.search-input{flex:1; min-width:200px; max-width:320px; padding:8px 14px; border:1px solid var(--border-strong); border-radius:var(--radius); background:var(--surface); color:var(--text); font-size:13px; font-family:inherit; outline:none}
+.search-input:focus{border-color:var(--accent); box-shadow:var(--ring)}
+.seg{display:inline-flex; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:3px; gap:2px; max-width:100%; overflow-x:auto; scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:0 0 auto; border:0; background:transparent; color:var(--muted); font-size:12.5px; font-weight:600; padding:6px 13px; border-radius:7px; cursor:pointer; font-family:inherit; white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.active{background:var(--surface); color:var(--accent); box-shadow:0 1px 4px rgba(59,37,75,.12)}
+
+.badge{display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:var(--radius-full); font-size:11.5px; font-weight:600; letter-spacing:.1px; white-space:nowrap; line-height:1.4; background:var(--surface2); color:var(--text2)}
+.badge-critical{background:var(--red-bg); color:var(--red-fg)}
+.badge-high{background:var(--orange-bg); color:var(--orange-fg)}
+.badge-medium{background:var(--yellow-bg); color:var(--yellow-fg)}
+.badge-low{background:var(--surface2); color:var(--muted)}
+.badge-ok{background:var(--green-bg); color:var(--green-fg)}
+.pill{display:inline-flex; align-items:center; gap:5px; height:22px; padding:0 9px; font-size:12px; font-weight:600; line-height:1; border-radius:var(--radius-full); background:var(--surface2); color:var(--text2); white-space:nowrap}
+.pill .dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+.pill-green{background:var(--green-bg); color:var(--green-fg)}
+.pill-red{background:var(--red-bg); color:var(--red-fg)}
+.pill-orange{background:var(--orange-bg); color:var(--orange-fg)}
+.pill-yellow{background:var(--yellow-bg); color:var(--yellow-fg)}
+.pill-blue{background:var(--blue-bg); color:var(--blue-fg)}
+.pill-accent{background:var(--accent-bg); color:var(--accent-fg)}
+.pill-neutral{background:var(--surface2); color:var(--muted)}
+.avatar{width:30px; height:30px; border-radius:50%; background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; text-transform:uppercase}
+
+/* ─ page ─ */
+.page{padding:16px 22px 80px; flex:1; display:flex; flex-direction:column; gap:14px}
+.dash-head{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.row-cap{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted2); margin:6px 0 -4px 2px}
+.row-cap span{font-weight:500; text-transform:none; letter-spacing:0; color:var(--muted)}
+
+.dash-kpi{width:100%; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px}
+@media (max-width:1250px){.dash-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.dash-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dkpi{display:flex; flex-direction:column; gap:2px; text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:15px 16px; box-shadow:var(--shadow-md); cursor:pointer; font-family:inherit; transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur)}
+.dkpi:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg); border-color:var(--accent2)}
+.dkpi.active{border-color:var(--accent2); box-shadow:0 0 0 1px var(--accent2) inset, var(--shadow-md)}
+.dkpi-top{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px; min-height:32px}
+.dkpi-ico{width:32px; height:32px; border-radius:9px; display:grid; place-items:center; font-size:15px}
+.dkpi-ico svg{width:17px; height:17px}
+.dkpi-ico.i-accent{background:var(--accent-bg); color:var(--accent-fg)}
+.dkpi-ico.i-orange{background:var(--orange-bg); color:var(--orange-fg)}
+.dkpi-ico.i-red{background:var(--red-bg); color:var(--red-fg)}
+.dkpi-ico.i-green{background:var(--green-bg); color:var(--green-fg)}
+.dkpi-ico.i-blue{background:var(--blue-bg); color:var(--blue-fg)}
+.dkpi-val{font-family:"Space Grotesk",Inter,sans-serif; font-size:28px; font-weight:800; letter-spacing:-1px; line-height:1; color:var(--text); font-variant-numeric:tabular-nums}
+.dkpi-val small{font-size:14px; font-weight:600; letter-spacing:0; color:var(--muted)}
+.dkpi-lbl{font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; font-weight:600; margin-top:5px}
+.dkpi-delta{font-size:11px; font-weight:800}
+.up{color:var(--green)} .down{color:var(--red)}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; box-shadow:var(--shadow-md)}
+.chart-title{font-size:13px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:8px; letter-spacing:.2px; flex-wrap:wrap}
+.chart-title .tt-sub{font-weight:500; color:var(--muted); letter-spacing:0}
+.chart-title .right{margin-left:auto; display:flex; gap:8px; align-items:center}
+.grid2{display:grid; grid-template-columns:1.4fr 1fr; gap:14px; align-items:start}
+.grid2b{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start}
+@media (max-width:1100px){.grid2,.grid2b{grid-template-columns:1fr}}
+
+/* ─ work list ─ */
+.table-card{background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); border:1px solid var(--border); overflow:hidden}
+.table-toolbar{padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.table-toolbar-title{font-family:"Space Grotesk",Inter,sans-serif; font-size:15px; font-weight:800}
+.table-count-pill{background:var(--accent-light); color:var(--accent); font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; font-variant-numeric:tabular-nums}
+.table-toolbar .right{margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.wl-row{display:flex; align-items:center; gap:13px; padding:12px 16px 12px 14px; border-bottom:1px solid var(--border); border-left:3px solid transparent; cursor:pointer; background:none; width:100%; text-align:left; font:inherit; color:inherit; transition:background .12s}
+.wl-row:last-child{border-bottom:0}
+.wl-row:hover{background:var(--surface2)}
+.wl-row.wl-critical{border-left:4px solid var(--red); background:color-mix(in srgb,var(--red) 4%,transparent)}
+.wl-row.wl-critical:hover{background:color-mix(in srgb,var(--red) 8%,transparent)}
+.wl-row.wl-overdue{border-left:4px solid var(--orange); background:color-mix(in srgb,var(--orange) 4%,transparent)}
+.wl-row.wl-overdue:hover{background:color-mix(in srgb,var(--orange) 8%,transparent)}
+.wl-row.wl-ok{border-left:4px solid var(--green)}
+.wl-id{font-family:ui-monospace,Menlo,monospace; font-size:11px; color:var(--muted); flex-shrink:0; min-width:56px}
+.wl-main{flex:1; min-width:0}
+.wl-text{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text)}
+.wl-meta{font-size:11.5px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.wl-right{margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end}
+.wl-pill{font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap}
+.wl-pill.crit{background:color-mix(in srgb,var(--red) 13%,transparent); color:var(--red)}
+.wl-pill.over{background:color-mix(in srgb,var(--orange) 13%,transparent); color:var(--orange)}
+.wl-pill.wait{background:color-mix(in srgb,var(--accent) 13%,transparent); color:var(--accent)}
+.wl-pill.ok{background:color-mix(in srgb,var(--green) 13%,transparent); color:var(--green)}
+.wl-pill.muted{background:var(--surface2); color:var(--muted)}
+.wl-time{font-size:11px; color:var(--muted); flex-shrink:0; min-width:64px; text-align:right}
+@media (max-width:760px){.wl-text,.wl-meta{white-space:normal}.wl-right{width:100%; justify-content:flex-start}}
+
+/* ─ payout rows ─ */
+.comp-row{display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid var(--border); border-left:3px solid transparent; cursor:pointer; background:none; width:100%; text-align:left; font:inherit; color:inherit}
+.comp-row:last-child{border-bottom:0}
+.comp-row:hover{background:var(--surface2)}
+.comp-row.u-critical{border-left-color:var(--red)}
+.comp-row.u-high{border-left-color:var(--orange)}
+.comp-row.u-medium{border-left-color:var(--yellow)}
+.comp-row.u-low{border-left-color:var(--green)}
+.comp-info{flex:1; min-width:0}
+.comp-line1{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+.comp-id{font-family:ui-monospace,Menlo,monospace; font-size:11px; font-weight:700; color:var(--muted)}
+.comp-name2{font-size:14px; font-weight:700; color:var(--text)}
+.comp-meta2{font-size:11.5px; color:var(--muted); margin:3px 0}
+.comp-text2{font-size:12.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.comp-right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; min-width:128px}
+.comp-amt{font-size:19px; font-weight:800; color:var(--accent); font-family:"Space Grotesk",Inter,sans-serif; line-height:1; white-space:nowrap; font-variant-numeric:tabular-nums}
+.tcomp{display:inline-flex; align-items:center; gap:8px; padding:5px 12px; border-radius:999px; font-size:12px; font-weight:800; white-space:nowrap; border:1px solid transparent}
+.tcomp-pending{background:var(--orange-bg); color:var(--orange); border-color:color-mix(in srgb,var(--orange) 30%,transparent)}
+.tcomp-queue{background:var(--blue-bg); color:var(--blue); border-color:color-mix(in srgb,var(--blue) 30%,transparent)}
+.tcomp-credited{background:var(--green-bg); color:var(--green); border-color:color-mix(in srgb,var(--green) 30%,transparent)}
+.tcomp-none{background:var(--surface2); color:var(--muted); border-color:var(--border-strong)}
+
+/* ─ tables ─ */
+.tbl-scroll{overflow-x:auto}
+.cx-table{width:100%; border-collapse:separate; border-spacing:0; font-size:13px}
+.cx-table thead th{background:var(--surface2); text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; color:var(--muted); padding:11px 12px; border-bottom:1px solid var(--border); white-space:nowrap}
+.cx-table thead th:first-child{padding-left:18px}
+.cx-table td{padding:11px 12px; border-bottom:1px solid var(--border); vertical-align:middle; font-variant-numeric:tabular-nums}
+.cx-table td:first-child{padding-left:18px}
+.cx-table tbody tr:last-child td{border-bottom:0}
+.cx-table tbody tr:hover{background:var(--surface2)}
+.cx-table td.r,.cx-table th.r{text-align:right}
+.mut{color:var(--muted)}
+.mono{font-family:ui-monospace,Menlo,monospace; font-size:12px; font-weight:600}
+
+/* ─ misc blocks ─ */
+.info-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.info-item{display:flex; flex-direction:column; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:10px 12px}
+.info-item label{font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.info-item > span{font-size:13.5px; font-weight:600; margin-top:3px}
+.review-text-box{background:var(--surface2); border-radius:0 9px 9px 0; padding:12px 15px; font-size:13.5px; line-height:1.55; border-left:3px solid var(--border-strong)}
+.sec-title{display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 9px}
+.metric-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 2px; font-size:13px; border-bottom:1px solid var(--border)}
+.metric-row:last-child{border-bottom:0}
+.metric-lbl{color:var(--muted); font-weight:500}
+.metric-val{font-weight:800; font-size:15px; font-variant-numeric:tabular-nums}
+.sol-row{display:flex; align-items:center; gap:11px; background:var(--surface2); border-radius:11px; padding:11px 14px; margin-bottom:8px}
+.sol-row .ic{width:30px; height:30px; border-radius:9px; background:var(--surface); display:grid; place-items:center; font-size:15px; flex:none}
+.sol-row .vl{margin-left:auto; font-weight:700; font-size:16px; font-variant-numeric:tabular-nums}
+.check{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:7px; font-size:12.5px; line-height:1.45}
+.check li{display:flex; gap:9px; align-items:flex-start}
+.ck{flex:none; font-weight:800}
+.ck.ok{color:var(--green)} .ck.no{color:var(--red)} .ck.wt{color:var(--orange)}
+.photos{display:flex; gap:8px; flex-wrap:wrap}
+.photo{width:76px; height:76px; border-radius:12px; border:1px solid var(--border); background:var(--surface2); display:grid; place-items:center; font-size:10px; color:var(--muted); text-align:center; padding:6px; line-height:1.25}
+.prog{background:var(--surface2); border-radius:5px; height:9px; overflow:hidden}
+.prog span{display:block; height:100%; background:var(--accent); border-radius:5px}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--text2); align-items:center}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px}
+.field{display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border)}
+.field:last-child{border-bottom:0}
+.field .fl{font-size:13px; font-weight:500}
+.field .fh{font-size:11.5px; color:var(--muted); margin-top:2px}
+.form-input{padding:8px 12px; border:1px solid var(--border-strong); border-radius:9px; background:var(--surface); color:var(--text); font-size:13px; font-family:inherit; width:120px; text-align:right; font-variant-numeric:tabular-nums}
+.bars{display:flex; flex-direction:column; gap:10px}
+.bar-row{display:grid; grid-template-columns:140px 1fr 96px; gap:12px; align-items:center}
+.bar-lab{font-size:12.5px; color:var(--text2)}
+.bar-track{background:var(--surface2); border-radius:5px; height:18px}
+.bar-fill{height:100%; border-radius:5px; background:var(--data-1)}
+.bar-val{font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:7px; justify-content:flex-end}
+@media (max-width:620px){.bar-row{grid-template-columns:104px 1fr 86px}}
+.heat{width:100%; border-collapse:separate; border-spacing:4px; font-size:12.5px}
+.heat th{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; color:var(--muted2); padding:2px 4px; text-align:center; white-space:nowrap}
+.heat th.rh{text-align:left; text-transform:none; font-size:12.5px; color:var(--text2); letter-spacing:0}
+.heat td{text-align:center; font-weight:700; padding:9px 4px; border-radius:8px; font-variant-numeric:tabular-nums}
+svg.chart{display:block; width:100%; height:auto; max-width:100%}
+.chart-wrap{position:relative}
+.demo-pill{font-size:11px; font-weight:700; background:var(--yellow-bg); color:var(--yellow-fg); border-radius:var(--radius-full); padding:4px 10px}
+.link{background:none; border:0; padding:0; font:inherit; font-size:12px; color:var(--muted); cursor:pointer; text-decoration:underline; text-underline-offset:3px}
+.link:hover{color:var(--text)}
+
+/* ─ modal ─ */
+.modal-overlay{position:fixed; inset:0; background:rgba(16,24,40,.45); display:none; align-items:flex-start; justify-content:center; z-index:500; padding:26px 20px; overflow:auto; backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:720px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:var(--shadow-lg); border:1px solid var(--border)}
+.modal-top{flex:none; background:var(--surface); border-bottom:1px solid var(--border); position:relative}
+.modal-header{padding:18px 42px 0 22px; display:flex; align-items:flex-start; gap:14px}
+.modal-head-left{display:flex; align-items:center; gap:13px; min-width:0}
+.modal-avatar{width:42px; height:42px; border-radius:50%; background:var(--accent-light); color:var(--accent); display:grid; place-items:center; font-weight:700; font-size:14px; flex:none}
+.modal-title{font-family:"Space Grotesk",Inter,sans-serif; font-size:20px; font-weight:700; line-height:1.1; letter-spacing:-.4px}
+.modal-id{font-size:12px; color:var(--muted); margin-top:1px}
+.modal-id b{color:var(--text2); font-family:"Space Grotesk",Inter,sans-serif; font-weight:700}
+.modal-close{position:absolute; top:16px; right:18px; width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-size:15px; color:var(--muted); display:flex; align-items:center; justify-content:center}
+.modal-close:hover{background:var(--surface2); color:var(--text)}
+.modal-badges{display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; padding:15px 22px}
+.mchip{display:inline-flex; flex-direction:column; gap:3px}
+.mchip-l{font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding-left:2px}
+.modal-assignee{font-size:11px; color:var(--muted); padding:0 22px 14px}
+.modal-tabs{display:flex; gap:4px; padding:12px 18px 0; border-bottom:1px solid var(--border); overflow-x:auto; scrollbar-width:none}
+.modal-tabs::-webkit-scrollbar{display:none}
+.modal-tab{white-space:nowrap; flex:0 0 auto; padding:9px 13px; font-size:13px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--muted); cursor:pointer; font-family:inherit; font-weight:600; border-radius:8px 8px 0 0}
+.modal-tab:hover{color:var(--text); background:var(--surface2)}
+.modal-tab.active{color:var(--text); border-bottom-color:var(--signal-deep); font-weight:700}
+.modal-body{flex:1; min-height:0; overflow-y:auto}
+.modal-tab-content{display:none; padding:18px 20px}
+.modal-tab-content.active{display:block}
+.modal-section{margin-bottom:20px}
+.modal-section:last-child{margin-bottom:0}
+.modal-footer{flex:none; display:flex; align-items:center; gap:12px; padding:13px 22px; border-top:1px solid var(--border); background:var(--surface2); flex-wrap:wrap}
+.modal-footer .btn{padding:10px 16px; font-size:13.5px}
+.modal-footer .btn-primary{padding:10px 22px}
+.modal-foot-note{flex:1 1 auto; min-width:0}
+.modal-foot-note{font-size:12px; color:var(--muted); margin-right:auto}
+
+
+/* ─ ТЗ ─ */
+.tz-wrap{display:grid; grid-template-columns:232px 1fr; gap:14px; align-items:start}
+@media (max-width:1000px){.tz-wrap{grid-template-columns:1fr}}
+.tz-toc{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:16px 14px; position:sticky; top:96px; max-height:calc(100vh - 120px); overflow-y:auto}
+@media (max-width:1000px){.tz-toc{position:static; max-height:none}}
+.tz-toc a{display:block; padding:5px 9px; border-radius:8px; color:var(--muted); text-decoration:none; font-size:12.5px; line-height:1.35}
+.tz-toc a:hover{background:var(--surface2); color:var(--text)}
+.tz-doc{padding:26px 30px; max-width:none}
+.tz-doc > *{max-width:74ch}
+.tz-h1{font-family:"Space Grotesk",Inter,sans-serif; font-size:26px; font-weight:700; letter-spacing:-.6px; margin:0 0 6px}
+.tz-h2{font-family:"Space Grotesk",Inter,sans-serif; font-size:18px; font-weight:700; letter-spacing:-.3px; margin:32px 0 10px; padding-top:18px; border-top:1px solid var(--border); scroll-margin-top:96px}
+.tz-doc .tz-h2:first-of-type{border-top:0; padding-top:0}
+.tz-h3{font-size:13.5px; font-weight:700; margin:20px 0 8px; color:var(--text); scroll-margin-top:96px}
+.tz-doc p{font-size:13.5px; line-height:1.62; color:var(--text2); margin:0 0 10px}
+.tz-doc p .mut{color:var(--muted)}
+.tz-doc a{color:var(--text); text-decoration:underline; text-underline-offset:3px}
+.tz-ul,.tz-ol{font-size:13.5px; line-height:1.6; color:var(--text2); margin:0 0 12px; padding-left:20px}
+.tz-ul li,.tz-ol li{margin-bottom:5px}
+.tz-doc .tbl-scroll{margin:6px 0 16px; border:1px solid var(--border); border-radius:var(--radius-md); max-width:100%}
+.tz-doc .cx-table td{font-variant-numeric:normal}
+.tz-doc b{color:var(--text)}
+
+/* ─ tooltip ─ */
+#tip{position:fixed; z-index:600; pointer-events:none; opacity:0; transition:opacity .09s; background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; box-shadow:var(--shadow-lg); padding:10px 12px; font-size:12.5px; min-width:130px}
+#tip .tt{font-weight:700; margin-bottom:6px; font-size:12px; font-family:"Space Grotesk",Inter,sans-serif}
+#tip .tr{display:flex; justify-content:space-between; gap:16px; padding:1px 0}
+#tip .tr i{display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:6px}
+
+/* ─ mobile ─ */
+.mobnav{display:none; position:fixed; left:0; right:0; bottom:0; z-index:200; background:var(--surface); border-top:1px solid var(--border); padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px)); grid-template-columns:repeat(5,1fr)}
+.mobnav button{display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:0; color:var(--muted); font-size:10.5px; font-weight:600; font-family:inherit; padding:5px 2px; cursor:pointer; position:relative}
+.mobnav button svg{width:20px; height:20px}
+.mobnav button.on{color:var(--accent)}
+.mn-badge{position:absolute; top:0; right:calc(50% - 20px); min-width:16px; height:16px; padding:0 4px; background:var(--red); color:#fff; border-radius:9px; font-size:9.5px; font-weight:800; display:flex; align-items:center; justify-content:center}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mobnav{display:grid}
+  .topbar{padding:12px 16px}
+  .topbar-search{display:none}
+  .page{padding:14px 16px 96px}
+  .info-grid{grid-template-columns:1fr}
+}
+
+body{background:var(--bg)}
+.doc-top{background:var(--surface); border-bottom:1px solid var(--border); padding:18px 28px; position:sticky; top:env(safe-area-inset-top,0px); z-index:50; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.doc-top .brand{font-family:"Space Grotesk",Inter,sans-serif; font-size:19px; font-weight:800; letter-spacing:-.4px}
+.doc-top .sub{font-size:12.5px; color:var(--muted)}
+.doc-page{padding:18px 28px 80px; max-width:1180px; margin:0 auto}
+@media (max-width:900px){.doc-top{padding:14px 16px} .doc-page{padding:14px 16px 60px}}
+@media print{
+  .doc-top, .tz-toc{display:none}
+  .tz-wrap{display:block}
+  .tz-doc{border:0; box-shadow:none; padding:0}
+  .tz-h2{break-after:avoid} .tbl-scroll{break-inside:avoid}
+  body{background:#fff}
+}
+</style>
+<header class="doc-top">
+  <div><div class="brand">loopa</div><div class="sub">Каппі · програма таємного покупця</div></div>
+  <div style="margin-left:auto" class="sub">Версія 1.1 · 16.09.2026</div>
+</header>
+<div class="doc-page"><div class="tz-wrap"><nav class="tz-toc"><div class="sec-title">Розділи</div><a href="#tz-scope">1. Назначение и границы</a><a href="#tz-roles">2. Роли и границы автономии</a><a href="#tz-entities">3. Сущности и статусы</a><a href="#tz-process">4. Сквозной процесс</a><a href="#tz-registry">5. Реестр тайников</a><a href="#tz-coverage">6. Планирование: матрица покрытия и квоты</a><a href="#tz-task-generation">7. Генерация задания</a><a href="#tz-acceptance">8. Набор, акцепт и ответственность</a><a href="#tz-channels">9. Каналы проверки</a><a href="#tz-standards">10. База эталонов блюд</a><a href="#tz-questionnaire">11. Анкета</a><a href="#tz-provocations">12. Провокации</a><a href="#tz-review">13. Приёмка анкеты агентом</a><a href="#tz-scoring">14. Оценка и скоринг</a><a href="#tz-reports">15. Отчёты в чаты</a><a href="#tz-payouts">16. Выплаты</a><a href="#tz-support">17. Поддержка тайников</a><a href="#tz-analytics">18. Аналитика</a><a href="#tz-ui">19. Раздел «Тайники» в Loopa</a><a href="#tz-integrations">20. Источники данных и интеграции</a><a href="#tz-nfr">21. Нефункциональные требования</a><a href="#tz-stages">22. Этапы внедрения</a><a href="#tz-open">23. Открытые вопросы</a></nav><article class="panel tz-doc"><h1 class="tz-h1">Бот тайного покупателя Каппі</h1>
+<p><span class="mut">Техническое задание · версия 1.1 · 16 сентября 2026</span></p>
+<h2 class="tz-h2" id="tz-scope">1. Назначение и границы</h2>
+<h3 class="tz-h3" id="tz-section-1">Цель</h3>
+<p>Телеграм-бот с AI-агентом, который самостоятельно ведёт программу тайного покупателя Каппі: планирует проверки, генерирует задания, набирает исполнителей, принимает и оценивает анкеты, рассылает отчёты по рабочим чатам и формирует заявки на выплату. Человек в контуре — маркетолог как владелец программы и админ-группа как исполнитель платежей.</p>
+<p>Задача программы — получать объективную, повторяемую и сопоставимую картину качества по каждому филиалу, каналу и группе (кухня, курьеры, оператор, поддержка), а также валидировать обещанное время доставки фактическим.</p>
+<h3 class="tz-h3" id="tz-section-2">В границах первой версии</h3>
+<ul class="tz-ul"><li>Полный цикл волны: планирование → задание → акцепт → выполнение → анкета → приёмка → оценка → отчёт → выплата</li><li>Каналы: сайт, мобильное приложение, телефон, самовывоз, Glovo</li><li>Реестр тайников, рейтинг, кулдаун, блэклист</li><li>База эталонов блюд как внешний источник (Google Drive или выгрузка на сервер)</li><li>Провокации как опциональное сценарное задание</li><li>Отчёты в рабочие чаты Telegram и передача данных в Loopa</li></ul>
+<h3 class="tz-h3" id="tz-section-3">Вне границ первой версии</h3>
+<ul class="tz-ul"><li>Автоматический перевод денег — бот формирует заявку, платит человек</li><li>Автоматический набор тайников из клиентской базы — первые 30–40 заводятся вручную</li><li>Внешние платформы отзывов (Google Maps, TripAdvisor) — они живут в контуре Loopa</li><li>Мобильное приложение для тайника — весь интерфейс в Telegram</li></ul>
+<h3 class="tz-h3" id="tz-section-4">Глоссарий</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Термин</th><th>Значение</th></tr></thead><tbody><tr><td>Тайник</td><td>Тайный покупатель, зарегистрированный в программе</td></tr><tr><td>Волна</td><td>Еженедельный набор на проверки с фиксированным числом слотов</td></tr><tr><td>Слот</td><td>Одно оплачиваемое место в волне, привязанное к дате и времени</td></tr><tr><td>Задание</td><td>Персональное ТЗ на конкретную проверку, сгенерированное агентом</td></tr><tr><td>Анкета</td><td>Структурированный отчёт тайника по выполненному заданию</td></tr><tr><td>Эталон</td><td>Карточка нормы по блюду: состав, вес, вид, комплектность, характерные особенности</td></tr><tr><td>Провокация</td><td>Заранее спланированная нестандартная ситуация для проверки реакции персонала</td></tr><tr><td>Матрица покрытия</td><td>План проверок по срезам на квартал: филиал, канал, время, тип, категория меню</td></tr><tr><td>Агент</td><td>AI-агент, исполняющий процесс программы</td></tr></tbody></table></div>
+<h2 class="tz-h2" id="tz-roles">2. Роли и границы автономии</h2>
+<h3 class="tz-h3" id="tz-section-5">Роли</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Роль</th><th>Кто</th><th>Зона ответственности</th></tr></thead><tbody><tr><td>Агент</td><td>AI в боте</td><td>Исполняет процесс: планирование, генерация заданий, приёмка, оценка, отчёты, заявки на выплату</td></tr><tr><td>Владелец программы</td><td>Маркетинг-менеджер</td><td>Руководитель агента: правила, веса оценки, спорные решения, блэклист, бюджет</td></tr><tr><td>Админ-группа</td><td>Telegram-группа администраторов</td><td>Фактический перевод денег и отметка «выплачено»</td></tr><tr><td>Эскалация</td><td>COO</td><td>Арбитраж с производством, жёсткие сценарии провокаций</td></tr><tr><td>Владелец эталонов</td><td>Шеф-повар</td><td>Ведёт карточки эталонов и характерные особенности блюд</td></tr><tr><td>Получатели отчётов</td><td>Руководители точек, шеф, старший курьер, старший оператор</td><td>Работа с результатом, право оспорить оценку</td></tr><tr><td>Тайник</td><td>Внешний исполнитель</td><td>Выполняет задание и сдаёт анкету</td></tr></tbody></table></div>
+<h3 class="tz-h3" id="tz-section-6">Что агент решает сам, а что готовит</h3>
+<p>Правило: всё, что затрагивает деньги конкретного человека или его репутацию внутри компании, агент только предлагает. Остальное исполняет самостоятельно.</p>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Агент делает сам</th><th>Агент готовит, решает маркетолог</th></tr></thead><tbody><tr><td>Планирует квоты и матрицу покрытия</td><td>Изменение весов и порогов оценки</td></tr><tr><td>Генерирует и выдаёт задания</td><td>Отказ в выплате</td></tr><tr><td>Открывает и закрывает волну</td><td>Внесение в блэклист</td></tr><tr><td>Принимает анкету, считает оценку</td><td>Разбор спорной анкеты и апелляции</td></tr><tr><td>Рассылает отчёты по чатам</td><td>Публикация красной оценки с привязкой к конкретному сотруднику</td></tr><tr><td>Ведёт рейтинг тайников</td><td>Изменение правил программы, бюджета и каталога провокаций</td></tr><tr><td>Формирует заявку на выплату</td><td>Жёсткие сценарии провокаций (совместно с COO)</td></tr></tbody></table></div>
+<p>Каждое решение агента сопровождается записью обоснования в журнал: что проверено, какие расхождения найдены, почему принято именно это решение. Без журнала спор по анкете неразрешим.</p>
+<p><b>Контроль качества самого агента.</b> Еженедельный дайджест маркетологу: сколько анкет принято, отклонено, отправлено на доработку; какие задания сгенерированы и по каким срезам; 1–2 анкеты случайной выборкой на ручную перепроверку. Это страхует от ситуации, когда агент месяцами штампует однотипные задания.</p>
+<h2 class="tz-h2" id="tz-entities">3. Сущности и статусы</h2>
+<p>Центральная сущность — <b>проверка</b>. У неё один идентификатор (П-0416), и внутри неё живут задание, анкета, оценка и выплата. Отдельных номеров у задания и анкеты нет: заявка на выплату получает тот же номер с префиксом В-. Это правило важно соблюдать в интерфейсе и в отчётах — иначе одно событие обсуждается под четырьмя разными номерами.</p>
+<p><b>Проверка:</b> запланирована → задание выдано → акцептовано → в исполнении → анкета сдана → на автопроверке → на ревью маркетолога → принята / на доработке / отклонена → закрыта. Тупик: срыв.</p>
+<p><b>Тайник:</b> кандидат → активный → на паузе → блэклист → архив</p>
+<p><b>Волна:</b> черновик → открыт набор → набор закрыт → в исполнении → закрыта</p>
+<p><b>Выплата:</b> ожидает приёмки анкеты → согласована → в очереди на выплату → выплачена → подтверждена получателем. Тупики: отклонена, спорная.</p>
+<p><b>Эталон:</b> черновик → опубликован → устарел (заменён новой версией)</p>
+<p>Остальные сущности: слот, оценка по группе, провокация, тикет, запись блэклиста, матрица покрытия.</p>
+<h2 class="tz-h2" id="tz-process">4. Сквозной процесс</h2>
+<ol class="tz-ol"><li><b>Планирование.</b> Агент смотрит матрицу покрытия, выбирает самые отстающие срезы и формирует параметры волны</li><li><b>Открытие волны.</b> Раз в неделю бот публикует в чате тайников приглашение с датами и условиями</li><li><b>Набор.</b> Первые два откликнувшихся и акцептовавших занимают слоты. Набор закрывается. Остальным бот предлагает свободные слоты будущих недель</li><li><b>Генерация задания.</b> Под каждый занятый слот агент собирает персональное ТЗ: позиции, филиал, канал, окно даты и времени, бюджет, требования к доказательствам, при необходимости — провокация</li><li><b>Акцепт.</b> Тайник видит задание целиком и принимает или отказывается. Слот считается занятым только после акцепта</li><li><b>Выполнение.</b> Тайник делает заказ, бот напоминает и сопровождает</li><li><b>Анкета.</b> Блок «сайт/приложение» заполняется сразу после оформления заказа, остальные — после получения</li><li><b>Приёмка.</b> Агент сверяет анкету с данными Syrve и эталонами, принимает, возвращает на доработку или передаёт на ревью маркетологу</li><li><b>Оценка.</b> Расчёт баллов по группам, проверка критических ошибок</li><li><b>Отчёты.</b> Адресная рассылка по рабочим чатам, срез по зоне ответственности</li><li><b>Выплата.</b> Заявка в админ-группу, перевод, подтверждение получения</li><li><b>Постобработка.</b> Красная зона → тикет в Loopa с ответственным и сроком, при исправлении → повторная проверка в ближайшей волне</li></ol>
+<h2 class="tz-h2" id="tz-registry">5. Реестр тайников</h2>
+<h3 class="tz-h3" id="tz-section-7">Онбординг</h3>
+<p>Анкета кандидата: имя, телефон, Telegram ID, район проживания, доступные каналы (доставка, самовывоз, Glovo), наличие аккаунта на сайте и в приложении, удобные дни и время.</p>
+<p>Верификация до активации: не сотрудник Каппі, не родственник сотрудника, не связан с конкурентом. Проверка телефона по базе Syrve и по базе сотрудников.</p>
+<p>Согласия с фиксацией даты и версии текста: обработка персональных данных и фотографий, конфиденциальность, правила программы.</p>
+<p>Перед первым заданием — короткий инструктаж и проверочный тест: что можно и нельзя, как снимать фото, как заполнять анкету, что считается нарушением. Без прохождения задание не выдаётся.</p>
+<h3 class="tz-h3" id="tz-section-8">Кулдаун и ротация</h3>
+<ul class="tz-ul"><li>Базовое правило: одному человеку задание предлагается не чаще раза в два месяца. При достижении базы в 40+ активных — раз в три месяца</li><li>Отсчёт от даты выполненного заказа, не от выплаты</li><li>Проверка кулдауна выполняется при бронировании слота, а не при выдаче задания</li><li>Ротация адресов: агент отслеживает, не повторяется ли адрес доставки. Частый адрес узнаётся кухней, и заказ на него собирается лучше остальных</li><li>Ограничение действует не только на человека, но и на адрес, телефон и карту получателя выплаты</li></ul>
+<h3 class="tz-h3" id="tz-section-9">Рейтинг тайника</h3>
+<p>Складывается из качества сданных анкет: полнота, наличие и качество фото, содержательность комментариев, соблюдение сроков, соответствие заданию. Влияет на приоритет при распределении будущих слотов и на решение о продлении участия.</p>
+<h3 class="tz-h3" id="tz-section-10">Блэклист</h3>
+<p>Основания: фальсификация данных, систематический срыв акцептованных заданий, раскрытие себя персоналу, разглашение результатов, конфликт интересов, обнаруженный после активации.</p>
+<p>Вносит только маркетолог по представлению агента. Фиксируется основание, дата, срок. Человек уведомляется. Апелляция — через поддержку, разбирает COO.</p>
+<h2 class="tz-h2" id="tz-coverage">6. Планирование: матрица покрытия и квоты</h2>
+<p>Квоты задаются <b>до</b> волны, а не считаются постфактум.</p>
+<p>При двух слотах в неделю программа даёт около 8–9 анкет в месяц, то есть примерно по 4 на филиал. Целевые пропорции вроде «3 самовывоза из 30» закрываются за квартал, поэтому агент ведёт <b>скользящий план покрытия на 3 месяца</b> и на каждой волне выбирает наиболее отстающий срез.</p>
+<p>Срезы матрицы:</p>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Срез</th><th>Значения</th></tr></thead><tbody><tr><td>Филиал</td><td>Лазарева, Левітана</td></tr><tr><td>Канал</td><td>сайт, приложение, телефон, Glovo, самовывоз</td></tr><tr><td>Время суток</td><td>пик (18:00–21:00), непик</td></tr><tr><td>День недели</td><td>будни, выходные</td></tr><tr><td>Категория меню</td><td>суши и роллы, пицца, WOK, напитки и допы, новинки, акционные позиции</td></tr><tr><td>Провокация</td><td>без провокации, оператор, курьер, поддержка, точка</td></tr></tbody></table></div>
+<p>По каждому срезу хранится целевая доля и факт за скользящий квартал. Генератор задания берёт срез с максимальным отставанием.</p>
+<p><b>Проверка базы под план.</b> При кулдауне в два месяца один тайник даёт максимум 6 проверок в год; на 100 проверок нужно минимум 17 активных, реально 25–35 с учётом отказов. При переходе на три месяца — максимум 4 проверки в год, минимум 25 активных, реально 35–50. Переход на трёхмесячный кулдаун возможен только после набора соответствующей базы.</p>
+<h2 class="tz-h2" id="tz-task-generation">7. Генерация задания</h2>
+<h3 class="tz-h3" id="tz-section-11">Входные данные</h3>
+<ul class="tz-ul"><li>Отстающий срез из матрицы покрытия</li><li>Новинки меню</li><li>Действующие акции и промо</li><li>Позиции, давно не попадавшие в проверки (покрытие меню)</li><li>ABC-анализ продаж — приоритет ходовым позициям</li><li>Результаты прошлых проверок — повторная проверка зон, где были провалы</li><li>Негативные отзывы и тикеты из Loopa — проверка проблемных мест</li><li>Наличие опубликованного эталона по позиции</li></ul>
+<h3 class="tz-h3" id="tz-section-12">Состав задания</h3>
+<ul class="tz-ul"><li>Филиал и канал заказа</li><li>Окно даты и времени выполнения</li><li>Обязательные позиции и позиции на выбор</li><li>Бюджет: лимит суммы заказа, что делать при превышении</li><li>Действие при стоп-листе позиции из задания</li><li>Способ оплаты, использование бонусов или промокода — если это часть проверки</li><li>Провокация, если назначена</li><li>Требования к доказательствам: минимум фотографий, что именно снять, скриншот экрана подтверждения с обещанным временем</li><li>Памятка по характерным особенностям заказанных блюд</li><li>Правила конспирации</li><li>Дедлайн сдачи анкеты после получения заказа</li></ul>
+<p>Задание версионируется и хранится целиком вместе с анкетой — оценка спустя месяцы должна читаться в контексте того, что именно поручалось.</p>
+<h3 class="tz-h3" id="tz-section-13">Правила генератора</h3>
+<ul class="tz-ul"><li>Не назначать больше одной провокации на заказ</li><li>Не назначать позицию без опубликованного эталона</li><li>Не выходить за лимит бюджета</li><li>Соблюдать интервал повторной проверки одного и того же сотрудника (см. раздел «Провокации»)</li><li>Новинка попадает в проверку не раньше, чем через 7 дней после запуска в продажу</li></ul>
+<h2 class="tz-h2" id="tz-acceptance">8. Набор, акцепт и ответственность</h2>
+<h3 class="tz-h3" id="tz-section-14">Механика набора</h3>
+<p>Волна открывается публикацией в чате тайников. Слотов — два. Занимают первые двое, прошедшие акцепт. Набор закрывается автоматически.</p>
+<p>Откликнувшимся сверх лимита бот сразу предлагает свободные слоты будущих недель — человек не получает отказ, а бронирует дату вперёд. Календарь слотов ведётся на 4–8 недель.</p>
+<p>Резерв: при срыве одного из двух слот автоматически переходит первому в очереди отклика.</p>
+<h3 class="tz-h3" id="tz-section-15">Двойное подтверждение</h3>
+<p>Первое — отклик на волну. Это ещё не бронь.</p>
+<p>Второе — акцепт конкретного задания после его выдачи. Тайник видит полное ТЗ и нажимает «Принимаю» или «Отказываюсь». Тайм-аут акцепта — 12 часов, после чего слот уходит следующему.</p>
+<h3 class="tz-h3" id="tz-section-16">Что подтверждает тайник</h3>
+<p>Галочками, с фиксацией времени и версии текста:</p>
+<ul class="tz-ul"><li>Выполнить в оговорённое окно, сдать анкету в срок, приложить все требуемые фотографии</li><li>Не раскрывать себя и не обсуждать задание и результаты ни с кем, включая сотрудников Каппі</li><li>Понимает, что вымышленные или скопированные данные означают исключение из программы без выплаты</li><li>Не является сотрудником или родственником сотрудника, не связан с конкурентом</li><li>Согласен на обработку персональных данных и фотографий</li><li>Ознакомлен с условиями оплаты: что компенсируется, в каком размере, при каких условиях выплата не производится</li></ul>
+<h3 class="tz-h3" id="tz-section-17">Шкала последствий</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Нарушение</th><th>Последствие</th></tr></thead><tbody><tr><td>Отказ до начала окна выполнения</td><td>Без санкций</td></tr><tr><td>Акцептовал и не выполнил без предупреждения</td><td>Минус рейтинг, кулдаун удваивается; повторно — блэклист</td></tr><tr><td>Анкета сдана после дедлайна</td><td>Выплата производится, рейтинг снижается</td></tr><tr><td>Неполная анкета, нет обязательных фото</td><td>Возврат на доработку, срок 24 часа, далее отказ в выплате</td></tr><tr><td>Отклонение от задания: не те позиции, не тот филиал или канал</td><td>Частичная выплата или отказ — решает маркетолог</td></tr><tr><td>Фальсификация данных или фотографий</td><td>Блэклист, выплата не производится</td></tr><tr><td>Раскрыл себя персоналу</td><td>Задание не засчитывается, выплата по решению маркетолога</td></tr></tbody></table></div>
+<h3 class="tz-h3" id="tz-section-18">Отмена и форс-мажор</h3>
+<p>Отмена со стороны координатора (закрылась точка, снята акция) — с уведомлением и без санкций для тайника, слот переносится.</p>
+<p>Форс-мажор со стороны тайника (заболел, заказ не доехал, отменён рестораном) — отдельная кнопка в боте, разбирается вручную, рейтинг не снижается.</p>
+<h2 class="tz-h2" id="tz-channels">9. Каналы проверки</h2>
+<h3 class="tz-h3" id="tz-section-19">Сайт и приложение</h3>
+<p>Базовый канал. Оценивается весь путь: от входа до подтверждения заказа и трекинга. Детали — в разделе «Анкета».</p>
+<h3 class="tz-h3" id="tz-section-20">Телефон</h3>
+<p>Проверка работы оператора: скорость ответа, знание меню, корректность оформления, правила по времени и сумме заказа, апселл.</p>
+<h3 class="tz-h3" id="tz-section-21">Самовывоз</h3>
+<p>Отдельная ветка анкеты: нет курьера, но есть время ожидания на точке, встреча, состояние заказа к моменту выдачи, чистота и вид зоны выдачи.</p>
+<h3 class="tz-h3" id="tz-glovo">Glovo</h3>
+<p>Особенность канала — половина пути не наша, поэтому оценка разделяется.</p>
+<p>Что проверяется дополнительно:</p>
+<ul class="tz-ul"><li>Актуальность меню в Glovo: состав, цены, фото, описания — совпадение с сайтом</li><li>Стоп-листы: присутствуют ли в приложении позиции, которых фактически нет</li><li>Время сборки на нашей стороне — единственный участок тайминга в нашей зоне ответственности</li><li>Упаковка под внешнего курьера: заказ едет в общей сумке, требования жёстче</li><li>Комплектность при передаче курьеру</li></ul>
+<p>Курьер Glovo оценивается в отдельной группе и не попадает в зачёт своих курьеров. Данные используются для раздела Glovo в Loopa и для переговоров с площадкой.</p>
+<p>Технические оговорки: компенсация тайнику по Glovo-заказу идёт по отдельной схеме (чек в Glovo); сопоставление заказа с анкетой выполняется через интеграцию Glovo → Syrve и должно быть проверено до запуска канала. Блок «сайт и приложение» для этого канала заменяется на блок оценки приложения Glovo.</p>
+<h2 class="tz-h2" id="tz-standards">10. База эталонов блюд</h2>
+<h3 class="tz-h3" id="tz-section-22">Назначение</h3>
+<p>Эталон работает на двух концах: питает задание (на что смотреть) и питает оценку (агент сравнивает ответ с нормой). Без эталона тайник оценивает «понравилось или нет», а не соответствие стандарту.</p>
+<h3 class="tz-h3" id="tz-section-23">Хранение и владение</h3>
+<p>База ведётся вне бота — в Google Drive или выгрузкой на сервер. Структура: таблица карточек, привязанная к ID номенклатуры Syrve, плюс папка эталонных фотографий по тому же ID. Агент читает базу и подставляет карточки в задания и анкеты.</p>
+<p>Владелец содержания — шеф-повар, как и техкарты. Маркетолог отвечает за полноту базы под план проверок. Агент только читает.</p>
+<p>Требования к синхронизации: регулярное обновление, признак версии и даты публикации, запрет на использование карточек в статусе «черновик».</p>
+<h3 class="tz-h3" id="tz-section-24">Состав карточки</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Поле</th><th>Содержание</th></tr></thead><tbody><tr><td>ID номенклатуры Syrve</td><td>Связка с заказом для автоподстановки</td></tr><tr><td>Состав по ТТК</td><td>Что должно быть внутри</td></tr><tr><td>Базовые нормы закладки</td><td>Рис 150 г на стандартный ролл, 100 г на маки, нори 2 г, тесто 350 г, моцарелла 120 г, база WOK 180 г, фунчоза 150 г</td></tr><tr><td>Количество кусков</td><td>Маки — 6, inside-out — 8</td></tr><tr><td>Эталонные фото</td><td>В упаковке, без упаковки, в разрезе</td></tr><tr><td>Комплектность</td><td>Соусы, имбирь, васаби, палочки, салфетки — что и сколько</td></tr><tr><td>Упаковка</td><td>Коробка, пенал или рукав; стикер; положение блюда</td></tr><tr><td>Температура подачи</td><td>И допустимое падение к моменту вручения</td></tr><tr><td>Срок сохранения качества</td><td>Через сколько блюдо теряет свойства</td></tr><tr><td>Характерные особенности</td><td>3–5 проверяемых признаков (см. ниже)</td></tr></tbody></table></div>
+<p>Эталонное фото снимается на производстве в реальной упаковке. Студийное фото с сайта для сравнения непригодно — оно маркетинговое. При этом расхождение «фото на сайте против фактического вида» само становится отдельным пунктом анкеты.</p>
+<h3 class="tz-h3" id="tz-section-25">Характерные особенности</h3>
+<p>Ядро карточки — 3–5 конкретных признаков, сформулированных так, чтобы неспециалист ответил однозначно. Примеры формулировок:</p>
+<ul class="tz-ul"><li><b>Роллы:</b> срез ровный, начинка по центру, рис не пересушен и не разваливается, нори не размокла, икра распределена равномерно, куски одного размера</li><li><b>Пицца:</b> борт поднялся, низ пропечён, сыр расплавлен и не пережарен, начинка до края, не сместилась в коробке</li><li><b>WOK:</b> лапша не слиплась, соус не на дне контейнера, овощи не переварены, порция набита до уровня</li><li><b>Общее:</b> ничего не протекло, коробка не деформирована, всё заказанное на месте</li></ul>
+<p>Отдельно — <b>фирменные признаки</b>: по чему блюдо узнаётся как каппівське (соус, топпинг, способ нарезки, подача). В анкете это вопрос «выглядит как то, что ты заказывал у нас раньше, или как безымянное блюдо» — он ловит дрейф качества между сменами, невидимый в средних оценках.</p>
+<h3 class="tz-h3" id="tz-section-26">Что объективно, а что нет</h3>
+<ul class="tz-ul"><li><b>Проверяемо любым человеком:</b> количество кусков, комплектность, целостность, протечки, упаковка, соответствие фото — идёт в оценку с полным весом</li><li><b>Требует инструмента:</b> точный вес и температура. Инструменты тайникам не выдаются — вместо этого фото с предметом для масштаба и шкала «горячее / тёплое / холодное». Точные замеры остаются во внутренней аттестации</li><li><b>Субъективно:</b> вкус, солёность, острота — собираются, но с пониженным весом</li></ul>
+<h3 class="tz-h3" id="tz-section-27">Правила базы</h3>
+<ul class="tz-ul"><li>Версионирование: анкета привязывается к версии эталона на дату заказа, иначе сравнение периодов разваливается</li><li>Новинка без опубликованного эталона в проверку не попадает. Карточка создаётся до запуска позиции в продажу</li><li>Критические отклонения на уровне блюда — сразу красная зона без расчёта баллов: посторонний предмет, холодное блюдо, протечка, не то блюдо, отсутствие позиции в заказе</li><li>Очерёдность наполнения: топ-30 по ABC, все новинки, все акционные позиции; далее по требованию матрицы покрытия. Закрывать все 247 позиций сразу не требуется</li><li>Единый источник норм для программы тайников и для аттестации персонала — два набора стандартов вести нельзя</li></ul>
+<h2 class="tz-h2" id="tz-questionnaire">11. Анкета</h2>
+<p>Анкета собирается динамически под задание: канал, тип доставки, заказанные позиции и наличие провокации определяют состав блоков. Обязательные поля валидируются, отправка без требуемых фото невозможна. Поддерживается черновик с возвратом. Ответ «не применимо» исключается из знаменателя при расчёте.</p>
+<p>Анкета версионируется: изменение формулировок не должно ломать сопоставимость периодов.</p>
+<h3 class="tz-h3" id="tz-1">Блок 1. Сайт и приложение</h3>
+<p>Заполняется сразу после оформления заказа, до получения.</p>
+<ul class="tz-ul"><li>Канал: сайт desktop, сайт mobile, приложение, Glovo; первый заказ или повторный; вход в аккаунт или гостем</li><li>Время от входа до нажатия «Оформить», в минутах</li><li>Поиск нужной позиции: нашёл сразу, искал, не нашёл (что именно)</li><li>Карточка блюда: понятен ли состав, вес, соответствует ли фото ожиданию, указаны ли аллергены</li><li>Понятна ли итоговая цена без сюрпризов: доставка, минимальный заказ</li><li>Апселл-окно: появилось ли, уместное или раздражающее, купил ли что-то, не мешало ли оформлению</li><li>Корзина: легко ли менять количество, удалять, возвращаться в меню</li><li>Бонусы и промокод: нашёл ли поле, корректно ли списалось, понятен ли остаток</li><li>Чекаут: количество заполненных полей, подстановка адреса, удобство выбора времени, заметность поля комментария</li><li>Оплата: способ, прошла ли с первого раза, ошибки со скриншотом</li><li>Подтверждение заказа: пришло ли, за сколько, по какому каналу</li><li><b>Обещанное время доставки — обязательное поле со скриншотом экрана подтверждения</b></li><li>Трекинг статуса: есть ли, обновлялся ли, соответствовал ли реальности</li><li>Технические проблемы: любой баг со скриншотом</li><li>Субъективная скорость работы: быстро, приемлемо, тормозило</li><li>Сравнение: заказывал ли у конкурентов и где оформлять удобнее</li><li>Оценка удобства заказа по шкале и что изменил бы в первую очередь</li></ul>
+<h3 class="tz-h3" id="tz-2">Блок 2. Оператор</h3>
+<p>Заполняется, если был контакт: телефонный заказ, уточнение адреса, подтверждающий звонок, провокация.</p>
+<p>Скорость ответа, представился ли, вежливость и тон, знание меню и состава блюд, корректность уточнения адреса, правильность работы со временем заказа, предложение допов, корректность работы с бонусами, итог обращения.</p>
+<h3 class="tz-h3" id="tz-3">Блок 3. Кухня и блюда</h3>
+<p>Генерируется динамически: по одному мини-блоку на каждую заказанную позицию, вопросы берутся из характерных особенностей её эталона.</p>
+<p>Плюс общие вопросы: соответствие состава заказу, комплектность допов, температура по шкале, соответствие фактического вида фото на сайте, общая оценка вкуса и комментарий.</p>
+<h3 class="tz-h3" id="tz-4">Блок 4. Упаковка</h3>
+<p>Целостность коробки, протечки, правильность типа упаковки, стикер и брендинг, устойчивость при переноске, аккуратность выкладки внутри, наличие салфеток и приборов.</p>
+<h3 class="tz-h3" id="tz-5">Блок 5. Курьер</h3>
+<p>Для доставки своими силами: опоздание или досрочность относительно обещанного времени, предупредил ли о задержке, внешний вид и опрятность, наличие термосумки, вежливость, готовность оплаты картой, сдача, передача чека, поведение при нестандартной просьбе.</p>
+<p>Для Glovo — сокращённый блок в отдельной группе оценки.</p>
+<h3 class="tz-h3" id="tz-6">Блок 6. Тайминг</h3>
+<p>Фактическое время оформления, фактическое время вручения, обещанное время из подтверждения, отклонение. Сопоставляется с данными Syrve при приёмке.</p>
+<h3 class="tz-h3" id="tz-7">Блок 7. Самовывоз</h3>
+<p>Время прибытия против назначенного, время ожидания на точке, как встретили, был ли заказ готов, состояние заказа к моменту выдачи, чистота и вид зоны выдачи, наличие пакета и приборов.</p>
+<h3 class="tz-h3" id="tz-8">Блок 8. Провокация</h3>
+<p>Заполняется только при наличии назначенной провокации: что именно сделал тайник, дословная реакция сотрудника, время реакции, итог ситуации, субъективная оценка тона. Сравнивается с эталоном реакции из каталога.</p>
+<h3 class="tz-h3" id="tz-9">Блок 9. Общее</h3>
+<p>Общая оценка заказа по шкале, вероятность рекомендовать, главное впечатление свободным текстом, что исправить в первую очередь.</p>
+<h3 class="tz-h3" id="tz-10">Блок 10. Доказательства</h3>
+<p>Загрузка фотографий и скриншотов по списку из задания. Минимальный комплект: экран подтверждения заказа, заказ в упаковке, заказ без упаковки, минимум одно блюдо в разрезе, чек.</p>
+<h2 class="tz-h2" id="tz-provocations">12. Провокации</h2>
+<p>Провокация — опциональное сценарное задание. Назначается не чаще чем в одном задании из трёх, не более одной на заказ.</p>
+<h3 class="tz-h3" id="tz-section-28">Каталог с эталоном реакции</h3>
+<p>Каждая провокация — карточка, где указано не только действие тайника, но и что сотрудник обязан сделать по регламенту. Без эталона реакции оценка становится вкусовщиной.</p>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Адресат</th><th>Провокация</th><th>Что проверяем</th></tr></thead><tbody><tr><td>Оператор</td><td>Изменить адрес после подтверждения</td><td>Переоформит корректно или откажет</td></tr><tr><td>Оператор</td><td>Перенести время или дозаказать после оформления</td><td>Знает ли процедуру, пересчитает ли время</td></tr><tr><td>Оператор</td><td>Позиция в стоп-листе</td><td>Предложит замену или просто откажет</td></tr><tr><td>Оператор</td><td>Вопрос по составу и аллергенам</td><td>Знает меню или импровизирует</td></tr><tr><td>Оператор</td><td>Заказ «на время»</td><td>Корректность выставления с учётом правил по сумме и удалённым районам</td></tr><tr><td>Курьер</td><td>Сдача с крупной купюры</td><td>Есть ли размен, как выходит из положения</td></tr><tr><td>Курьер</td><td>Оплата картой на месте</td><td>Наличие терминала, реакция</td></tr><tr><td>Курьер</td><td>Оставить у двери или позвонить снизу</td><td>Вежливость и готовность</td></tr><tr><td>Курьер</td><td>Просьба порекомендовать блюдо</td><td>Знание продукта</td></tr><tr><td>Поддержка</td><td>Обоснованная жалоба на реальный недочёт</td><td>SLA, тон, решение, адекватность суммы компенсации</td></tr><tr><td>Поддержка</td><td>Пограничная жалоба без явного основания</td><td>Не раздаёт ли поддержка бонусы автоматически</td></tr><tr><td>Поддержка</td><td>Обращение через Instagram или Google вместо телефона</td><td>Работает ли канал, скорость ответа</td></tr><tr><td>Точка</td><td>Прийти за заказом на 20 минут позже</td><td>Сохранили ли качество, где хранился заказ</td></tr><tr><td>Точка</td><td>Прийти раньше назначенного времени</td><td>Как встретили, куда направили</td></tr></tbody></table></div>
+<h3 class="tz-h3" id="tz-section-29">Ограничения</h3>
+<ul class="tz-ul"><li>Допустимы только сценарии, встречающиеся у реальных клиентов. Искусственные конфликты и грубость запрещены</li><li>Запрещено: отменять заказ после начала приготовления, инициировать возврат денег ради теста, провоцировать конфликт при других гостях на точке, занимать курьера в час пик</li><li>Провокация не должна создавать реальные потери: если она ведёт к переделке блюда — это уже не тест</li><li>Жёсткие сценарии (реальный возврат, эскалация к руководству) — только с поштучным разрешением маркетолога и COO</li></ul>
+<h3 class="tz-h3" id="tz-section-30">Флаг тестового обращения</h3>
+<p>Если провокация оформлена как жалоба, она попадает в Loopa настоящим тикетом: поддержка отработает, кухня может переделать, деньги могут вернуться. Необходим признак «тестовое обращение», видимый только агенту и маркетологу. Такой тикет исключается из реальной статистики жалоб, компенсаций и бонусов, но сохраняется в аналитике программы. Без этого признака программа портит собственные метрики качества.</p>
+<h3 class="tz-h3" id="tz-section-31">Защита сотрудников</h3>
+<ul class="tz-ul"><li>Одного и того же оператора или курьера не провоцировать чаще раза в квартал</li><li>Результат единичной провокации не является основанием для депремирования. Основание — повторяющийся паттерн на нескольких проверках</li><li>Факт существования программы тайников команде известен, конкретные сценарии — нет. Скрытая тотальная слежка демотивирует, известная программа с понятными правилами — наоборот</li></ul>
+<h2 class="tz-h2" id="tz-review">13. Приёмка анкеты агентом</h2>
+<p>Приёмку выполняет агент. Чек-лист автопроверки фиксирован, иначе «агент принимает» означает «никто не принимает».</p>
+<h3 class="tz-h3" id="tz-section-32">Автопроверки</h3>
+<ul class="tz-ul"><li><b>Сверка с Syrve:</b> заказ существует, телефон тайника совпадает, филиал соответствует заданию, состав заказа соответствует заданию, сумма в пределах лимита, фактическое время вручения из системы сопоставлено с указанным в анкете</li><li><b>Фотографии:</b> комплект собран, время съёмки укладывается в окно выполнения, отсутствуют дубликаты фото из прошлых анкет (сравнение перцептивных хешей)</li><li><b>Внутренние противоречия:</b> высокая оценка температуры при комментарии о холодной еде и подобное</li><li><b>Содержательность:</b> комментарии не односложные, не скопированы из прошлых анкет</li><li><b>Аномалии к истории:</b> тайник систематически ставит одинаковые оценки</li><li><b>Соответствие эталонам:</b> ответы по характерным особенностям сопоставлены с карточками версии на дату заказа</li></ul>
+<h3 class="tz-h3" id="tz-section-33">Исходы</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Исход</th><th>Что происходит</th></tr></thead><tbody><tr><td>Принято</td><td>Анкета идёт в оценку, отчёты и выплату</td></tr><tr><td>На доработку</td><td>Тайнику направляется конкретный перечень недостающего, срок 24 часа</td></tr><tr><td>На ревью маркетолога</td><td>Агент фиксирует сомнение с формулировкой причины; решение принимает человек</td></tr><tr><td>Отклонено</td><td>Только по решению маркетолога, с основанием</td></tr></tbody></table></div>
+<p>Порог передачи на ревью задаётся числом (степень расхождения с данными Syrve, количество непройденных автопроверок), а не формулировкой «по ситуации». Значение выносится в настройки и меняется маркетологом.</p>
+<h2 class="tz-h2" id="tz-scoring">14. Оценка и скоринг</h2>
+<h3 class="tz-h3" id="tz-section-34">Группы оценки</h3>
+<p>Кухня и блюда, упаковка, курьер, оператор, сайт и приложение, поддержка, реакция на нестандартную ситуацию (провокация), курьер Glovo (отдельно, вне общего зачёта).</p>
+<p>Каждая группа считается независимо и не смешивается с остальными: кухня не должна тянуть вниз оценку сервиса и наоборот.</p>
+<h3 class="tz-h3" id="tz-section-35">Механика</h3>
+<ul class="tz-ul"><li>Единая шкала 0–100 по каждой группе</li><li>Веса вопросов внутри группы и веса групп в общей оценке задаются в настройках и меняются только маркетологом</li><li>Ответы «не применимо» исключаются из знаменателя</li><li>Пороги зон: зелёная, жёлтая, красная — значения выносятся в настройки</li><li>Субъективные вопросы (вкус, тон) входят с пониженным весом</li></ul>
+<h3 class="tz-h3" id="tz-section-36">Критические ошибки</h3>
+<p>Список критических ошибок даёт автоматический незачёт по группе независимо от набранных баллов: посторонний предмет в еде, холодное блюдо, протечка упаковки, не то блюдо, отсутствие оплаченной позиции, опоздание сверх установленного порога, грубость сотрудника.</p>
+<h3 class="tz-h3" id="tz-section-37">Последствия</h3>
+<ul class="tz-ul"><li>Красная зона или критическая ошибка — автоматический тикет в Loopa с ответственным и сроком исправления</li><li>После отметки об исправлении агент планирует повторную проверку того же среза в ближайшей волне</li><li>Оценка конкретного сотрудника публикуется только после согласования маркетологом</li></ul>
+<h3 class="tz-h3" id="tz-section-38">Арбитраж</h3>
+<p>Руководитель точки, шеф или старший смены могут оспорить оценку в течение установленного срока. Спор фиксируется, разбирает маркетолог, при необходимости эскалация к COO. Решение и обоснование сохраняются вместе с анкетой.</p>
+<h2 class="tz-h2" id="tz-reports">15. Отчёты в чаты</h2>
+<p>Бот добавляется в рабочие чаты и рассылает результаты адресно — каждому только его зона ответственности.</p>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Чат</th><th>Что получает</th></tr></thead><tbody><tr><td>Кухня Лазарева / Кухня Левітана</td><td>Блоки «кухня и блюда» и «упаковка» по своему филиалу</td></tr><tr><td>Курьеры</td><td>Блок «курьер» и тайминг</td></tr><tr><td>Операторы</td><td>Блок «оператор» и результаты провокаций по операторам</td></tr><tr><td>Поддержка</td><td>Результаты обращений и провокаций по поддержке</td></tr><tr><td>Админ-группа</td><td>Заявки на выплату</td></tr><tr><td>Руководство</td><td>Сводки и динамика по филиалам</td></tr></tbody></table></div>
+<h3 class="tz-h3" id="tz-section-39">Правила рассылки</h3>
+<ul class="tz-ul"><li><b>Анонимизация:</b> имя, телефон, адрес и Telegram тайника в рабочие чаты не попадают ни при каких условиях. Используется обезличенный идентификатор проверки</li><li>Формат сообщения: карточка с оценкой, ключевыми отклонениями и фотографиями плюс ссылка на полный отчёт в Loopa</li><li>Алерт по красной зоне — немедленно, остальное — недельной сводкой</li><li>Месячная сводка с динамикой и сравнением филиалов</li><li>Обратная связь из чата: кнопки «принято» и «не согласны»; второе открывает арбитраж</li></ul>
+<h2 class="tz-h2" id="tz-payouts">16. Выплаты</h2>
+<p>Фактический перевод выполняет администратор. Бот формирует заявку, ведёт статусы и закрывает цикл подтверждением получения.</p>
+<h3 class="tz-h3" id="tz-section-40">Расчёт суммы</h3>
+<p>Стоимость заказа берётся из Syrve, а не со слов тайника, и суммируется с фиксированной ставкой за анкету. Правила округления и предельная сумма задаются в настройках.</p>
+<h3 class="tz-h3" id="tz-section-41">Процесс</h3>
+<ol class="tz-ol"><li>Анкета принята → формируется заявка</li><li>В админ-группу уходит карточка: обезличенный идентификатор тайника, сумма, номер заказа, ссылка на анкету, итоговая оценка, кнопки «Выплатить», «Отклонить», «На доработку»</li><li>Нажатие «Выплатить» доступно только участникам с правом администратора; действие логируется</li><li>Администратор переводит деньги и отмечает статус «выплачена»</li><li>Тайнику приходит уведомление и кнопка <b>«деньги пришли»</b> — без этого подтверждения цикл не закрыт</li><li>Если тайник отмечает «деньги не пришли» — статус «спорная», тикет координатору, срок разбора</li></ol>
+<h3 class="tz-h3" id="tz-section-42">Контроль</h3>
+<ul class="tz-ul"><li>Напоминание администратору, если заявка висит дольше установленного SLA (ориентир — 3 рабочих дня)</li><li>Напоминание тайнику, если получение не подтверждено в течение 2 дней</li><li>Реестр выплат с фильтрами по периоду, филиалу, тайнику и статусу; выгрузка в Excel для закрытия месяца отдельной строкой затрат</li><li>Сводка бюджета программы: потрачено за месяц, средняя стоимость анкеты, прогноз до конца месяца, лимит и алерт при приближении к нему</li><li>История по каждому тайнику: количество заданий, сумма выплат, дата последней выплаты, наличие задолженности</li><li>Реквизиты хранятся с ограниченным доступом: видят только администраторы, в чаты и отчёты не попадают</li></ul>
+<h2 class="tz-h2" id="tz-support">17. Поддержка тайников</h2>
+<p>Канал поддержки — личная переписка с ботом, кнопка в карточке задания. Обращение уходит координатору, а не в общий чат, чтобы не раскрыть участника.</p>
+<h3 class="tz-h3" id="tz-section-43">База знаний и типовые сценарии</h3>
+<p>Бот отвечает сам по сценариям, человек подключается только при нестандартном случае:</p>
+<ul class="tz-ul"><li>Позиции из задания нет в наличии или она в стоп-листе</li><li>Сайт не принимает заказ, оплата не проходит</li><li>Заказ не доехал или доехал сильно позже окна</li><li>Курьер или сотрудник точки спросил, не тайник ли он</li><li>Не успеваю в окно — как перенести</li><li>Непонятен вопрос в анкете</li><li>Фотографии не загружаются или забыл сфотографировать</li><li>Заказ оказался реально плохим — что делать</li><li>Когда придут деньги</li></ul>
+<p>Также в базе знаний: правила программы, кулдаун, порядок расчёта оплаты, требования к фотографиям, основания для исключения.</p>
+<h3 class="tz-h3" id="tz-sla">SLA и эскалация</h3>
+<ul class="tz-ul"><li>Во время активного задания — ответ в течение 30 минут в рабочие часы</li><li>Вне активного задания — в течение суток</li><li>Назначенный координатор и подмена на выходные: проверки пика приходятся на вечер пятницы и субботу</li><li>Эскалация: координатор → маркетолог → COO. Вопросы по деньгам уходят сразу в ветку выплат</li></ul>
+<h3 class="tz-h3" id="tz-section-44">Проактивные уведомления</h3>
+<ul class="tz-ul"><li>Напоминание за день до окна выполнения и в день выполнения</li><li>Через час после ожидаемого получения заказа — напоминание заполнить анкету со ссылкой</li><li>Напоминание о незаполненной анкете до истечения дедлайна</li><li>Уведомления о смене статуса выплаты</li><li>После приёмки — краткая обратная связь: балл качества анкеты и что улучшить в следующий раз. Это основной инструмент удержания в программе</li></ul>
+<h2 class="tz-h2" id="tz-analytics">18. Аналитика</h2>
+<p>Аналитика программы встраивается в Loopa отдельным разделом, по образцу существующих разделов Glovo и Instagram.</p>
+<h3 class="tz-h3" id="tz-section-45">Срезы</h3>
+<p>Филиал, группа оценки, канал, позиция меню, категория меню, время суток, день недели, курьер, оператор, тайник, наличие провокации.</p>
+<h3 class="tz-h3" id="tz-section-46">Показатели</h3>
+<ul class="tz-ul"><li>Средняя оценка по группам и динамика по неделям и месяцам</li><li>Сравнение филиалов</li><li>Соответствие эталонам в процентах по позициям и категориям</li><li>Отклонение фактического времени доставки от обещанного — пара «обещано / фактически» плюс факт из Syrve. Данные передаются в контур прогноза времени доставки как валидационная выборка</li><li>Топ повторяющихся проблем и их статус исправления</li><li>Результативность провокаций по группам</li><li>Покрытие: процент выполнения матрицы за квартал, давно не проверявшиеся позиции и срезы</li><li>Стоимость программы: затраты на компенсации, средняя цена анкеты, затраты на одну выявленную проблему</li><li><b>Сопоставление оценок тайников с реальными отзывами и тикетами Loopa.</b> Расхождение (тайники ставят высоко, клиенты жалуются, или наоборот) — самостоятельный сигнал риска</li></ul>
+<h3 class="tz-h3" id="tz-section-47">Калибровка</h3>
+<p>Первые две-три волны проводятся как эталонные: результаты разбираются вручную маркетологом и шефом, формулировки вопросов и веса уточняются. До завершения калибровки данные не используются для оценки работы сотрудников.</p>
+<h2 class="tz-h2" id="tz-ui">19. Раздел «Тайники» в Loopa</h2>
+<p>Рабочее место маркетолога — отдельный раздел Loopa, собранный по тому же паттерну, что разделы Glovo и Instagram. Бот остаётся интерфейсом тайника, Loopa — интерфейсом компании.</p>
+<h3 class="tz-h3" id="tz-ui-tabs">Состав вкладок</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Вкладка</th><th>Что на ней</th></tr></thead><tbody><tr><td>Черга</td><td>Стартовый экран: только то, что требует решения человека — анкеты на ревью и доработке, выплаты без подтверждения, незаполненные слоты волны. Плюс строка KPI и панель «что агент сделал сам»</td></tr><tr><td>Хвилі</td><td>Открытая волна со слотами, очередь и брони на 4–8 недель, матрица покрытия за квартал, история волн</td></tr><tr><td>Перевірки</td><td>Список всех проверок периода с оценками по группам и статусом; клик открывает карточку</td></tr><tr><td>Тайники</td><td>Реестр, рейтинг, кулдаун, блэклист, панель антифрода</td></tr><tr><td>Виплати</td><td>Заявки со статусами, бюджет программы, правила расчёта</td></tr><tr><td>Еталони</td><td>Покрытие эталонами по категориям и карточка позиции</td></tr><tr><td>Аналітика</td><td>Динамика по группам, обещано против факта, сопоставление с отзывами клиентов</td></tr><tr><td>Правила</td><td>Веса, пороги, механика программы, таблица границ автономии агента</td></tr></tbody></table></div>
+<h3 class="tz-h3" id="tz-ui-card">Карточка проверки</h3>
+<p>Открывается модальным окном по образцу карточки тикета: шапка с идентификатором и датой, ряд управляющих чипов (состояние, канал, оценка, провокация, выплата), строка автопроверок и вкладки — Анкета, Замовлення, Оцінка, Медіа, Прогрес. Внизу панель решения: принять, вернуть на доработку, отклонить, и подпись о том, что решение уходит в журнал агента.</p>
+<p>Во вкладке «Анкета» рядом с чек-листом автопроверок выводится предложение агента — что он рекомендует сделать и почему. Человек соглашается одним нажатием или решает иначе.</p>
+<h3 class="tz-h3" id="tz-ui-roles">Права и мобильный вид</h3>
+<ul class="tz-ul"><li>Маркетолог видит раздел целиком и принимает решения</li><li>Администратор видит только вкладку выплат и кнопку перевода</li><li>Руководитель точки и шеф — режим чтения по своему филиалу, с правом оспорить оценку</li><li>Персональные данные тайника не показываются никому, кроме маркетолога и администратора; в отчётах и чатах используется обезличенный ID</li><li>Мобильный вид повторяет существующую нижнюю панель Loopa: «Тайники» встают в неё пятым пунктом со счётчиком непрочитанных решений</li></ul>
+<h2 class="tz-h2" id="tz-integrations">20. Источники данных и интеграции</h2>
+<h3 class="tz-h3" id="tz-191-syrve-iiko">20.1. Syrve (iiko) — основной источник фактов</h3>
+<p>Без этого источника не работает автопроверка анкет и вся объективная часть оценки.</p>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Данные</th><th>Для чего</th></tr></thead><tbody><tr><td>Заказ по номеру и телефону: дата и время создания, филиал, состав, количество, сумма, скидки и бонусы, тип заказа, адрес</td><td>Сверка анкеты с фактом, расчёт суммы выплаты</td></tr><tr><td>Тайминги заказа: приём, подтверждение, готовность, передача курьеру, вручение</td><td>Объективный тайминг вместо слов тайника</td></tr><tr><td>Обещанное время, зафиксированное в системе</td><td>Пара «обещано / фактически»</td></tr><tr><td>Курьер и оператор по заказу</td><td>Привязка оценки к исполнителю</td></tr><tr><td>Номенклатура: ID, название, категория, цена, актуальность</td><td>Связка с эталонами, генерация заданий</td></tr><tr><td>Стоп-листы на момент заказа</td><td>Проверка корректности поведения при отсутствии позиции</td></tr><tr><td>ABC-отчёт продаж и отчёт «Кол-во блюд»</td><td>Приоритизация позиций в матрице покрытия</td></tr><tr><td>Карточка клиента и история заказов по телефону</td><td>Антифрод, проверка конфликта интересов, будущий автонабор</td></tr></tbody></table></div>
+<p>Способ получения: API или регулярные OLAP-выгрузки. Требование к глубине: доступ к заказу не позднее чем через час после закрытия.</p>
+<h3 class="tz-h3" id="tz-192-loopa-review360">20.2. Loopa (Review360)</h3>
+<p>Двусторонний обмен.</p>
+<p><b>Читаем:</b> тикеты и жалобы за период с категорией, критичностью, временем решения и суммой компенсации; оценки заказов и блюд от реальных клиентов; негативные отзывы как вход для генерации заданий; отзывы с внешних площадок, уже подключённых к Loopa.</p>
+<p><b>Пишем:</b> анкеты и отчёты программы; автотикеты по красной зоне с ответственным и сроком; признак «тестовое обращение» на тикетах, порождённых провокациями.</p>
+<h3 class="tz-h3" id="tz-193-google-drive">20.3. База эталонов (Google Drive или выгрузка на сервер)</h3>
+<p>Таблица карточек, привязанная к ID номенклатуры Syrve, плюс папка эталонных фотографий по тому же ID. Содержит нормы закладки, комплектность, тип упаковки, температуру подачи и характерные особенности. Версия и дата публикации обязательны.</p>
+<p>Первоисточник содержания — техкарты Syrve и стандарты шеф-повара. Фотографии и характерные особенности в ТТК отсутствуют и создаются специально под программу.</p>
+<h3 class="tz-h3" id="tz-194-cappix">20.4. CappiX</h3>
+<p>Новинки с датой запуска и составом, действующие акции и промо с периодом и условиями, календарь кампаний. Питает генератор заданий. До подключения допускается ручное ведение перечня маркетологом.</p>
+<h3 class="tz-h3" id="tz-195">20.5. Сайт и приложение</h3>
+<ul class="tz-ul"><li>Обещанное время доставки, показанное клиенту в интерфейсе — фиксируется скриншотом тайника; при наличии API берётся напрямую</li><li>Меню сайта: цены, фото, описания — для сверки с Syrve и с меню Glovo</li><li>Конфигурация апселл-окна: какие пары показываются в период проверки</li><li>Статусы трекинга заказа</li></ul>
+<h3 class="tz-h3" id="tz-196-glovo">20.6. Glovo</h3>
+<p>Меню площадки (позиции, цены, фото, описания, доступность) для сверки с сайтом; заказы, поступающие в Syrve через существующую интеграцию; время сборки на нашей стороне. До запуска канала необходимо подтвердить, что Glovo-заказ однозначно сопоставляется с анкетой.</p>
+<h3 class="tz-h3" id="tz-197">20.7. Кадровые данные</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Данные</th><th>Для чего</th><th>Источник</th></tr></thead><tbody><tr><td>Список сотрудников с телефонами</td><td>Проверка конфликта интересов при верификации тайника</td><td>HR</td></tr><tr><td>График смен: кто работал в момент заказа — оператор, повара, курьер</td><td>Привязка оценки к смене и исполнителю</td><td>График смен, Syrve</td></tr></tbody></table></div>
+<p>Без графика смен оценка «кухня Лазарева» остаётся обезличенной, а повторяющийся паттерн по конкретному сотруднику не выявляется. Использование этих данных ограничено правилом из раздела <a href="#tz-provocations">Провокации</a>: единичный результат не является основанием для кадрового решения.</p>
+<h3 class="tz-h3" id="tz-198">20.8. Внутренние регламенты как эталон реакции</h3>
+<p>Каталог провокаций требует зафиксированной нормы поведения сотрудника. Источники: регламент обработки заказа оператором (правила времени, суммы, удалённых районов), стандарты упаковки, скрипты поддержки, стандарты аттестации персонала. Ведут маркетолог и COO.</p>
+<h3 class="tz-h3" id="tz-199-telegram">20.9. Telegram</h3>
+<p>Идентификаторы рабочих чатов, чата тайников и админ-группы; Telegram ID тайников; состав участников групп с правами для маршрутизации отчётов и заявок на выплату.</p>
+<h3 class="tz-h3" id="tz-1910">20.10. Собственные данные бота</h3>
+<p>Реестр тайников с историей участия, рейтингом, кулдауном и блэклистом; задания и их версии; анкеты, фотографии и оценки; матрица покрытия; журнал решений агента; реестр выплат; настройки весов, порогов и ставок.</p>
+<h3 class="tz-h3" id="tz-1911">20.11. Финансовые данные</h3>
+<p>Реквизиты для выплат с ограниченным доступом; месячный лимит бюджета программы; строка затрат для книги закрытия месяца.</p>
+<h3 class="tz-h3" id="tz-1912">20.12. Критичность и очерёдность</h3>
+<div class="tbl-scroll"><table class="cx-table"><thead><tr><th>Источник</th><th>Критичность</th><th>Когда нужен</th></tr></thead><tbody><tr><td>Syrve — заказы и тайминги</td><td>Блокирующая</td><td>Этап 2, автоприёмка</td></tr><tr><td>База эталонов (топ-30 позиций)</td><td>Блокирующая</td><td>Этап 1, блок оценки блюд</td></tr><tr><td>Telegram — чаты и идентификаторы</td><td>Блокирующая</td><td>Этап 1</td></tr><tr><td>Список сотрудников для верификации</td><td>Высокая</td><td>Этап 1, онбординг тайников</td></tr><tr><td>Loopa — запись анкет и тикетов</td><td>Высокая</td><td>Этап 2</td></tr><tr><td>Регламенты как эталон реакции</td><td>Высокая</td><td>Этап 2, провокации</td></tr><tr><td>График смен</td><td>Средняя</td><td>Этап 2, персональная привязка</td></tr><tr><td>CappiX — новинки и акции</td><td>Средняя</td><td>Этап 2, можно вести вручную</td></tr><tr><td>Syrve — ABC и номенклатура</td><td>Средняя</td><td>Этап 2, матрица покрытия</td></tr><tr><td>Glovo — меню и сопоставление заказов</td><td>Средняя</td><td>Этап 2, запуск канала</td></tr><tr><td>Сайт — конфигурация апселла и API времени</td><td>Низкая</td><td>Этап 3, пока достаточно скриншотов</td></tr></tbody></table></div>
+<h2 class="tz-h2" id="tz-nfr">21. Нефункциональные требования</h2>
+<ul class="tz-ul"><li><b>Персональные данные.</b> Телефоны, адреса и фотографии тайников хранятся с ограниченным доступом, в рабочие чаты не попадают. Срок хранения фотографий и анкет определяется отдельно; по истечении — обезличивание</li><li><b>Журналирование.</b> Все действия агента и администраторов логируются: кто, когда, что решил и на каком основании. Журнал доступен маркетологу</li><li><b>Роли доступа.</b> Тайник, координатор, маркетолог, администратор, наблюдатель (руководитель точки — только чтение по своему филиалу)</li><li><b>Язык интерфейса.</b> Украинский, с возможностью добавления русского</li><li><b>Отказоустойчивость.</b> При недоступности Syrve анкета принимается с пометкой «сверка отложена» и автопроверка выполняется позже. При сбое бота маркетолог может ввести анкету вручную</li><li><b>Настройки без разработчика.</b> Веса, пороги, суммы выплат, правила кулдауна, число слотов, каталог провокаций, тексты согласий — редактируются в административном интерфейсе с версионированием</li></ul>
+<h2 class="tz-h2" id="tz-stages">22. Этапы внедрения</h2>
+<p><b>Этап 1 — MVP.</b> Ручной реестр тайников, волны, акцепт, генерация заданий по упрощённым правилам, анкета с блоками сайта, кухни, упаковки, курьера и оператора, ручная приёмка маркетологом, заявки на выплату, отчёты в два чата. Каналы: сайт и приложение, самовывоз. База эталонов — топ-30 позиций.</p>
+<p><b>Этап 2.</b> Автоприёмка агентом, матрица покрытия и автоматические квоты, рейтинг тайников, интеграция с Syrve, раздел аналитики в Loopa, канал Glovo, провокации первого уровня.</p>
+<p><b>Этап 3.</b> Автоматизация набора из клиентской базы, расширение эталонов, передача данных в прогноз доставки, повторные проверки по закрытым тикетам, полный каталог провокаций.</p>
+<h2 class="tz-h2" id="tz-open">23. Открытые вопросы</h2>
+<p>Закрыто в версии 1.1: Glovo входит в первую версию как канал проверки; деньги переводит администратор, агент только формирует заявку; база эталонов живёт в Google Drive с выгрузкой на сервер, карточки заводит шеф-повар.</p>
+<ul class="tz-ul"><li>Размер фиксированной ставки за анкету и предельная сумма компенсации заказа</li><li>Конкретные значения весов групп и порогов зон — определяются по итогам калибровочных волн</li><li>Срок хранения фотографий и анкет</li><li>Оформление отношений с тайниками с точки зрения выплат физическим лицам</li><li>Кто исполняет роль координатора поддержки и кто подменяет его на выходных</li><li>Перечень рабочих чатов с идентификаторами и ответственными</li></ul></article></div></div>
