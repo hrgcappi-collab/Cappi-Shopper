@@ -879,6 +879,16 @@ def екран_доступу(chat):
     say(chat, "\n".join(рядки), inline=inline or None)
 
 
+def запамятати_групу(ч):
+    """Кожна група, де бот є, — у реєстр: id, назва, коли бачили востаннє."""
+    відомі = сховище.json_читати("групи.json", {})
+    зап = відомі.get(str(ч["id"]), {})
+    зап.update({"назва": ч.get("title") or "", "тип": ч.get("type"), "востаннє": форма.зараз()})
+    зап.setdefault("додано", форма.зараз())
+    відомі[str(ч["id"])] = зап
+    сховище.json_писати("групи.json", відомі)
+
+
 def прив_язати_чат(chat):
     inline = [[{"text": назва, "callback_data": f"к:{назва}"}] for назва in налаштування.дай("чати")]
     say(chat, "Який це чат?", inline=inline, keys=False)
@@ -895,6 +905,7 @@ def повідомлення(m):
     текст = (m.get("text") or "").strip()
 
     if chat < 0:                                      # групи: лише /чат і зворотний зв'язок
+        запамятати_групу(m["chat"])
         if текст.startswith("/чат") and access.роль(користувач.get("id")):
             прив_язати_чат(chat)
         return
@@ -1525,6 +1536,17 @@ def обробити(u):
         elif "message" in u:
             with _замок(u["message"]["chat"]["id"]):
                 повідомлення(u["message"])
+        elif "my_chat_member" in u:
+            ч = u["my_chat_member"]["chat"]
+            if ч["id"] < 0:
+                статус = (u["my_chat_member"].get("new_chat_member") or {}).get("status")
+                if статус in ("member", "administrator"):
+                    запамятати_групу(ч)
+                    журнал.запис("агент", "група:додано", ч.get("title") or ч["id"])
+                elif статус in ("left", "kicked"):
+                    відомі = сховище.json_читати("групи.json", {})
+                    відомі.pop(str(ч["id"]), None)
+                    сховище.json_писати("групи.json", відомі)
     except Exception:
         traceback.print_exc()
         try:
